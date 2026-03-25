@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>CodeQuest — Learn to Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07090f;--s1:#0d1019;--s2:#121520;--s3:#181c2a;
+  --b1:#1c2035;--b2:#232843;--b3:#2d3454;
+  --t1:#eef0ff;--t2:#8b94c0;--t3:#454d72;
+  --py:#4d8df5;--html:#ff6433;--css:#c260ff;--js:#f5c518;
+  --react:#29d7f5;--sql:#3ecf8e;--git:#ff4d6d;--dsa:#9b72f5;--ai:#f562b8;
+  --ok:#22c55e;--warn:#f59e0b;--err:#f87171;
+  --font:"Space Grotesk",system-ui,sans-serif;
+  --mono:"JetBrains Mono",monospace;
+}
+html,body{height:100%;overflow:hidden;-webkit-text-size-adjust:100%;}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:14px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px;}
+
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:0;transition:opacity .5s;}
+#loading.out{opacity:0;pointer-events:none;}
+.ld-rings{position:relative;width:72px;height:72px;margin-bottom:24px;}
+.ld-ring{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;animation:spin linear infinite;}
+.ld-ring:nth-child(1){border-top-color:#4d8df5;animation-duration:1.2s;}
+.ld-ring:nth-child(2){inset:8px;border-right-color:#c260ff;animation-duration:1.8s;animation-direction:reverse;}
+.ld-ring:nth-child(3){inset:16px;border-bottom-color:#f562b8;animation-duration:2.4s;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ld-logo{font-size:28px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#4d8df5,#c260ff,#f562b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.ld-sub{font-size:11px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin:4px 0 20px;}
+.ld-bar-wrap{width:180px;height:2px;background:var(--b1);border-radius:1px;overflow:hidden;}
+.ld-bar{height:100%;width:0;background:linear-gradient(90deg,#4d8df5,#c260ff);transition:width .3s;}
+#ld-msg{font-size:11px;color:var(--t3);margin-top:8px;font-family:var(--mono);}
+
+/* ── TOPBAR ── */
+.topbar{height:46px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;z-index:100;}
+.logo{font-size:16px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#4d8df5,#c260ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;flex-shrink:0;user-select:none;}
+.back-btn{display:none;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--b2);border-radius:6px;font-size:11px;color:var(--t2);cursor:pointer;background:none;font-family:var(--font);transition:all .12s;flex-shrink:0;}
+.back-btn:hover{color:var(--t1);border-color:var(--b3);}
+.sep{width:1px;height:16px;background:var(--b1);flex-shrink:0;}
+.bc{font-size:11px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+.bc b{color:var(--t1);}
+.chips{display:flex;gap:5px;flex-shrink:0;}
+.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;transition:transform .15s;cursor:default;}
+.chip:hover{transform:scale(1.05);}
+.chip-xp{background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.18);color:#f5c518;}
+.chip-streak{background:rgba(255,100,51,.08);border:1px solid rgba(255,100,51,.18);color:#ff8c69;}
+.chip-done{background:rgba(155,114,245,.08);border:1px solid rgba(155,114,245,.18);color:#9b72f5;}
+
+/* ── SCREENS ── */
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.screen{display:none;flex:1;overflow:hidden;min-height:0;}
+.screen.active{display:flex;animation:scr .18s ease;}
+@keyframes scr{from{opacity:0}to{opacity:1}}
+
+/* ══ HOME ══════════════════════════════════════════════════ */
+#home{flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.home-top{padding:28px 20px 16px;text-align:center;position:relative;}
+.home-top::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:500px;height:200px;background:radial-gradient(ellipse,rgba(77,141,245,.06),transparent 70%);pointer-events:none;}
+.home-top h1{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;}
+.home-top h1 span{background:linear-gradient(135deg,#4d8df5,#c260ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.home-top p{font-size:12px;color:var(--t2);max-width:340px;margin:0 auto;line-height:1.7;}
+
+/* stats */
+.stats-row{display:flex;justify-content:center;gap:8px;padding:12px 16px;flex-wrap:wrap;}
+.stat-card{flex:1;min-width:80px;max-width:120px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:10px 12px;text-align:center;}
+.stat-n{font-size:20px;font-weight:800;line-height:1;}
+.stat-l{font-size:10px;color:var(--t3);margin-top:3px;letter-spacing:.05em;}
+
+/* continue */
+.cont-wrap{padding:0 16px 10px;}
+.cont-card{background:linear-gradient(135deg,rgba(77,141,245,.08),rgba(194,96,255,.08));border:1px solid rgba(77,141,245,.2);border-radius:12px;padding:12px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .15s;}
+.cont-card:hover{border-color:rgba(77,141,245,.4);background:linear-gradient(135deg,rgba(77,141,245,.13),rgba(194,96,255,.13));}
+.cont-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.cont-title{font-size:13px;font-weight:600;}
+.cont-arrow{font-size:20px;color:var(--py);}
+
+/* leaderboard */
+.lb-wrap{padding:0 16px 12px;}
+.lb-card{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:12px 14px;}
+.lb-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.lb-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--b1);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{font-size:12px;font-weight:700;width:20px;text-align:center;color:var(--t3);}
+.lb-rank.g1{color:#ffd700;}.lb-rank.g2{color:#c0c0c0;}.lb-rank.g3{color:#cd7f32;}
+.lb-name{flex:1;font-size:12px;font-weight:600;}
+.lb-xp{font-size:11px;color:var(--py);font-weight:700;}
+.lb-bar-wrap{width:60px;height:3px;background:var(--b1);border-radius:2px;overflow:hidden;}
+.lb-bar{height:100%;background:linear-gradient(90deg,var(--py),var(--css));border-radius:2px;}
+
+/* section label */
+.sec-lbl{padding:0 16px 8px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);}
+
+/* track grid */
+.tracks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(162px,1fr));gap:10px;padding:0 16px 32px;}
+.tc{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px 14px 12px;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;user-select:none;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden;}
+.tc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c);}
+.tc:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.tc-ico{font-size:28px;margin-bottom:8px;display:block;}
+.tc-name{font-size:13px;font-weight:700;color:var(--c);margin-bottom:2px;}
+.tc-sub{font-size:10px;color:var(--t3);margin-bottom:10px;line-height:1.5;}
+.tc-pbar{height:3px;background:var(--b1);border-radius:2px;margin-bottom:6px;overflow:hidden;}
+.tc-pfill{height:100%;border-radius:2px;background:var(--c);transition:width .5s;}
+.tc-meta{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--t3);}
+.tc-badge{padding:1px 7px;border-radius:4px;font-weight:700;font-size:10px;background:color-mix(in srgb,var(--c) 15%,transparent);color:var(--c);}
+
+/* ══ TRACK LIST ═══════════════════════════════════════════ */
+#trkscreen{flex-direction:column;overflow:hidden;}
+.trk-hero{padding:18px 16px 14px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;position:relative;overflow:hidden;}
+.trk-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 120%,color-mix(in srgb,var(--c,#4d8df5) 12%,transparent),transparent);pointer-events:none;}
+.trk-hero-row{display:flex;align-items:center;gap:12px;position:relative;}
+.trk-ico{font-size:26px;}
+.trk-name{font-size:17px;font-weight:800;}
+.trk-sub{font-size:11px;color:var(--t2);margin-top:1px;}
+.trk-bar-wrap{height:3px;background:var(--b1);border-radius:2px;margin-top:10px;overflow:hidden;position:relative;}
+.trk-bar{height:100%;background:var(--c);border-radius:2px;transition:width .5s;}
+.trk-stats{font-size:11px;color:var(--t3);margin-top:6px;position:relative;}
+.trk-stats b{color:var(--t1);}
+.ch-list{flex:1;overflow-y:auto;padding:10px 14px 28px;}
+.ch-item{display:flex;align-items:center;gap:12px;padding:12px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;margin-bottom:7px;cursor:pointer;transition:all .13s;-webkit-tap-highlight-color:transparent;position:relative;}
+.ch-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c);border-radius:3px 0 0 3px;opacity:0;transition:opacity .15s;}
+.ch-item:hover{background:var(--s3);border-color:var(--b2);}
+.ch-item:hover::before,.ch-item.done::before{opacity:1;}
+.ch-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--c);flex-shrink:0;transition:transform .15s;}
+.ch-item:hover .ch-num{transform:scale(1.08);}
+.ch-info{flex:1;min-width:0;}
+.ch-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ch-sub{font-size:10px;color:var(--t3);margin-top:1px;}
+.ch-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.ch-xp{font-size:10px;font-weight:700;color:var(--c);}
+.ch-star{font-size:14px;opacity:.1;transition:opacity .2s,transform .3s;}
+.ch-item.done .ch-star{opacity:1;transform:rotate(8deg);}
+.ch-proj{background:linear-gradient(135deg,color-mix(in srgb,var(--py) 8%,transparent),color-mix(in srgb,var(--css) 8%,transparent));border-color:color-mix(in srgb,var(--css) 25%,transparent);}
+
+/* ══ LESSON SCREEN ════════════════════════════════════════ */
+#lessonscreen{flex-direction:row;overflow:hidden;}
+
+/* sidebar */
+.sb{width:188px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden;}
+.sb-head{padding:10px 12px;border-bottom:1px solid var(--b1);}
+.sb-name{font-size:11px;font-weight:700;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--c,var(--t1));}
+.sb-xp-wrap{height:2px;background:var(--b1);border-radius:1px;overflow:hidden;margin-bottom:3px;}
+.sb-xp-fill{height:100%;background:var(--c,var(--py));border-radius:1px;transition:width .5s;}
+.sb-xp-row{display:flex;justify-content:space-between;font-size:9px;color:var(--t3);}
+.sb-list{flex:1;overflow-y:auto;padding:3px 0;}
+.sb-item{display:flex;align-items:center;gap:6px;padding:7px 10px;cursor:pointer;border-left:2px solid transparent;transition:all .1s;user-select:none;-webkit-tap-highlight-color:transparent;}
+.sb-item:hover,.sb-item:active{background:var(--s2);}
+.sb-item.active{background:var(--s2);border-left-color:var(--c,var(--py));}
+.sb-item-ico{font-size:13px;flex-shrink:0;}
+.sb-item-info{flex:1;min-width:0;}
+.sb-item-name{font-size:10.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-item-xp{font-size:9px;color:var(--t3);}
+.sb-star{font-size:10px;opacity:.1;}
+.sb-item.done .sb-star{opacity:1;}
+
+/* lesson pane */
+.lesson-pane{width:38%;min-width:200px;border-right:1px solid var(--b1);overflow-y:auto;padding:20px 18px 48px;-webkit-overflow-scrolling:touch;flex-shrink:0;}
+.ch-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;background:color-mix(in srgb,var(--c,var(--py)) 12%,transparent);color:var(--c,var(--py));}
+.ch-h1{font-size:19px;font-weight:800;margin-bottom:4px;line-height:1.25;letter-spacing:-.3px;}
+.ch-sub{font-size:12px;color:var(--t2);margin-bottom:16px;line-height:1.6;}
+.theory{font-size:12.5px;color:#a8b4d0;line-height:1.85;}
+.theory h3{font-size:10px;font-weight:700;color:var(--t1);margin:16px 0 6px;text-transform:uppercase;letter-spacing:.08em;}
+.theory p{margin-bottom:9px;}
+.theory code,.theory .ic{padding:2px 5px;border-radius:4px;font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);color:#c5ccff;}
+.callout{border-left:2px solid var(--c,var(--py));padding:9px 12px;border-radius:0 7px 7px 0;margin:12px 0;font-size:11.5px;line-height:1.7;background:color-mix(in srgb,var(--c,var(--py)) 6%,transparent);color:var(--t2);}
+.og{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;margin:7px 0;}
+.or{font-size:11px;color:var(--t3);padding:2px 0;}
+.or code{font-size:10px;background:rgba(255,255,255,.05);padding:1px 4px;border-radius:3px;font-family:var(--mono);}
+.ex-block{margin:16px 0 0;}
+.ex-lbl,.exp-lbl,.ch-box-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;color:var(--t3);}
+.ex-code{background:#030508;border:1px solid var(--b1);border-radius:8px;padding:11px 13px;font-family:var(--mono);font-size:11px;color:#7890aa;white-space:pre;overflow-x:auto;line-height:1.7;cursor:pointer;transition:border-color .15s;-webkit-overflow-scrolling:touch;}
+.ex-code:hover{border-color:var(--c,var(--py));}
+.load-btn{margin-top:6px;padding:5px 12px;border:1px solid color-mix(in srgb,var(--c,var(--py)) 35%,transparent);border-radius:6px;font-size:11px;cursor:pointer;background:color-mix(in srgb,var(--c,var(--py)) 8%,transparent);color:var(--c,var(--py));font-family:var(--font);font-weight:600;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.load-btn:hover{background:color-mix(in srgb,var(--c,var(--py)) 15%,transparent);}
+.ch-box{margin-top:18px;border:1px solid color-mix(in srgb,var(--c,var(--py)) 25%,transparent);border-radius:10px;padding:14px;background:color-mix(in srgb,var(--c,var(--py)) 5%,transparent);}
+.ch-box-title{font-size:13px;font-weight:700;margin-bottom:6px;}
+.ch-box-desc{font-size:11.5px;line-height:1.75;color:#8898b8;}
+.ch-box-desc code,.ch-box-desc .ic{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:11px;color:#c5ccff;}
+.ch-box-desc strong{color:var(--t1);}
+.exp-wrap{margin-top:11px;}
+.exp-code{background:#030508;border:1px solid var(--b1);border-radius:6px;padding:7px 10px;font-family:var(--mono);font-size:11px;color:#556070;white-space:pre;overflow-x:auto;}
+.done-banner{display:none;margin-top:13px;border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.55;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);color:#86efac;}
+.done-banner.show{display:block;animation:slideIn .25s ease;}
+.done-banner strong{color:#4ade80;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.nxt-btn{display:none;width:100%;margin-top:9px;padding:10px;border:none;border-radius:8px;background:var(--ok);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:filter .15s,transform .12s;-webkit-tap-highlight-color:transparent;}
+.nxt-btn.show{display:block;}
+.nxt-btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
+
+/* ── EDITOR PANEL ── */
+.ed-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;min-height:0;}
+.ed-hd{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;gap:6px;flex-wrap:nowrap;}
+.ed-file{font-size:10px;color:var(--t3);font-family:var(--mono);background:var(--s2);padding:2px 7px;border-radius:4px;border:1px solid var(--b1);white-space:nowrap;}
+.ed-acts{display:flex;gap:4px;align-items:center;flex-wrap:nowrap;}
+.btn{display:inline-flex;align-items:center;gap:3px;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);white-space:nowrap;transition:all .13s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+.btn:active:not(:disabled){transform:scale(.95);}
+.btn-run{background:var(--ok);color:#fff;}
+.btn-run:hover:not(:disabled){filter:brightness(1.1);}
+.btn-check{background:#7c3aed;color:#fff;}
+.btn-check:hover:not(:disabled){filter:brightness(1.15);}
+.btn-hint{background:rgba(245,197,24,.1);color:#f5c518;border:1px solid rgba(245,197,24,.2);}
+.btn-hint:hover:not(:disabled){background:rgba(245,197,24,.18);}
+.btn-rst{background:var(--s2);color:var(--t2);border:1px solid var(--b1);}
+.btn-rst:hover:not(:disabled){color:var(--t1);}
+
+/* ── SYNTAX HIGHLIGHT EDITOR ── */
+.ed-wrap{flex:1;display:flex;overflow:hidden;min-height:0;position:relative;}
+.highlight-layer{position:absolute;inset:0;padding:12px 10px 12px 48px;font-family:var(--mono);font-size:13px;line-height:1.75;white-space:pre-wrap;word-wrap:break-word;overflow:hidden;pointer-events:none;color:#c5ccff;tab-size:4;z-index:0;}
+.hl-kw{color:#bf89ff;font-weight:500;}/* keywords */
+.hl-bi{color:#6ec6f0;}/* builtins */
+.hl-st{color:#89d6b4;}/* strings */
+.hl-cm{color:#4d5870;font-style:italic;}/* comments */
+.hl-nm{color:#f0aa5e;}/* numbers */
+.hl-fn{color:#6ec6f0;}/* function names */
+.hl-de{color:#bf89ff;}/* def/class */
+.hl-at{color:#f562b8;}/* decorator */
+.hl-op{color:#7ab8e8;}/* operators */
+/* HTML highlighting */
+.hl-tag{color:#f47067;}
+.hl-attr{color:#ffd080;}
+.hl-val{color:#89d6b4;}
+.hl-ent{color:#f562b8;}
+/* CSS highlighting */
+.hl-sel{color:#6ec6f0;}
+.hl-prop{color:#bf89ff;}
+.hl-cval{color:#89d6b4;}
+/* SQL */
+.hl-sql-kw{color:#6ec6f0;font-weight:500;}
+.hl-sql-fn{color:#bf89ff;}
+.hl-sql-str{color:#89d6b4;}
+.hl-sql-nm{color:#f0aa5e;}
+
+#code-ed{position:relative;z-index:1;flex:1;background:transparent;color:transparent;caret-color:#e8ecff;border:none;outline:none;font-family:var(--mono);font-size:13px;line-height:1.75;padding:12px 10px 12px 48px;resize:none;width:100%;tab-size:4;overflow:auto;-webkit-overflow-scrolling:touch;-webkit-appearance:none;spellcheck:false;}
+#code-ed::selection{background:rgba(124,58,237,.35);color:transparent;}
+.line-nums{position:absolute;left:0;top:0;width:42px;padding:12px 8px 12px 0;background:#030508;border-right:1px solid var(--b1);font-family:var(--mono);font-size:13px;line-height:1.75;color:var(--b3);text-align:right;pointer-events:none;overflow:hidden;user-select:none;white-space:pre;z-index:2;}
+
+/* web editor */
+.web-ed-wrap{flex:1;display:flex;overflow:hidden;min-height:0;position:relative;}
+.web-hl{position:absolute;inset:0;padding:12px 10px 12px 48px;font-family:var(--mono);font-size:13px;line-height:1.75;white-space:pre-wrap;word-wrap:break-word;overflow:hidden;pointer-events:none;z-index:0;tab-size:2;}
+#web-ed{position:relative;z-index:1;flex:1;background:transparent;color:transparent;caret-color:#e8ecff;border:none;outline:none;font-family:var(--mono);font-size:13px;line-height:1.75;padding:12px 10px 12px 48px;resize:none;width:100%;tab-size:2;overflow:auto;-webkit-overflow-scrolling:touch;-webkit-appearance:none;}
+#web-ed::selection{background:rgba(124,58,237,.35);color:transparent;}
+#web-lns{position:absolute;left:0;top:0;width:42px;padding:12px 8px 12px 0;background:#030508;border-right:1px solid var(--b1);font-family:var(--mono);font-size:13px;line-height:1.75;color:var(--b3);text-align:right;pointer-events:none;overflow:hidden;user-select:none;white-space:pre;z-index:2;}
+
+/* sql editor */
+.sql-ed-wrap{flex:1;display:flex;overflow:hidden;min-height:0;position:relative;}
+.sql-hl{position:absolute;inset:0;padding:12px 10px 12px 48px;font-family:var(--mono);font-size:13px;line-height:1.75;white-space:pre-wrap;word-wrap:break-word;overflow:hidden;pointer-events:none;z-index:0;tab-size:2;}
+#sql-ed{position:relative;z-index:1;flex:1;background:transparent;color:transparent;caret-color:#e8ecff;border:none;outline:none;font-family:var(--mono);font-size:13px;line-height:1.75;padding:12px 10px 12px 48px;resize:none;width:100%;tab-size:2;overflow:auto;-webkit-overflow-scrolling:touch;-webkit-appearance:none;}
+#sql-ed::selection{background:rgba(124,58,237,.35);color:transparent;}
+#sql-lns{position:absolute;left:0;top:0;width:42px;padding:12px 8px 12px 0;background:#030508;border-right:1px solid var(--b1);font-family:var(--mono);font-size:13px;line-height:1.75;color:var(--b3);text-align:right;pointer-events:none;overflow:hidden;user-select:none;white-space:pre;z-index:2;}
+
+/* web tabs + preview */
+.web-tabs{display:flex;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;}
+.web-tab{padding:6px 14px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;}
+.web-tab.active{color:var(--t1);border-bottom-color:var(--c,var(--py));}
+.preview-wrap{flex:1;display:flex;flex-direction:column;border-top:1px solid var(--b1);min-height:0;}
+.preview-hd{display:flex;align-items:center;justify-content:space-between;padding:4px 12px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;}
+.preview-lbl{font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+#preview{flex:1;border:none;background:#fff;width:100%;display:block;}
+
+/* output */
+.out-wrap{border-top:1px solid var(--b1);flex-shrink:0;height:155px;display:flex;flex-direction:column;}
+.out-hd{display:flex;align-items:center;justify-content:space-between;padding:4px 12px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;}
+.out-lbl{font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+.out-st{font-size:10px;font-weight:700;}
+.out-body{flex:1;overflow-y:auto;padding:9px 12px;font-family:var(--mono);font-size:12px;line-height:1.7;background:#030508;-webkit-overflow-scrolling:touch;white-space:pre-wrap;word-break:break-word;}
+.od{color:var(--t3);font-style:italic;}.ook{color:#7dcca0;}.oerr{color:#f4a0a0;}.ohint{color:#fcd34d;}.owin{color:#86efac;}
+.sql-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:3px;}
+.sql-tbl th{background:var(--s2);color:var(--t3);padding:4px 8px;text-align:left;border:1px solid var(--b1);font-weight:600;}
+.sql-tbl td{padding:3px 8px;border:1px solid var(--b1);}
+.sql-tbl tr:hover td{background:rgba(255,255,255,.015);}
+
+/* git terminal */
+.git-term{flex:1;background:#030508;padding:12px;overflow-y:auto;font-family:var(--mono);font-size:12.5px;-webkit-overflow-scrolling:touch;line-height:1.7;min-height:0;}
+.git-ps1{color:var(--ok);user-select:none;}
+.git-cmd-text{color:var(--t1);}
+.git-out{color:var(--t3);}.git-ok{color:#7dcca0;}.git-err{color:#f4a0a0;}.git-info{color:#60a5fa;}
+.git-input-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#030508;border-top:1px solid var(--b1);flex-shrink:0;}
+.git-ps1-label{color:var(--ok);font-family:var(--mono);font-size:12.5px;user-select:none;}
+.git-input{flex:1;background:transparent;border:none;outline:none;color:var(--t1);font-family:var(--mono);font-size:12.5px;caret-color:var(--py);}
+
+/* ── MOBILE TABS ── */
+.mob-tabs{display:none;flex-shrink:0;height:50px;background:var(--s1);border-bottom:1px solid var(--b1);}
+.mob-tabs-inner{display:flex;height:100%;}
+.mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border-bottom:2px solid transparent;font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--t3);-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:color .1s,border-color .1s;}
+.mob-tab.active{color:var(--t1);}
+.mob-tab-ico{font-size:15px;}
+.mob-panel{display:none;flex:1;overflow:hidden;flex-direction:column;min-height:0;}
+.mob-panel.active{display:flex;}
+
+/* MOBILE CODE PANEL: force full height chain */
+#mob-code-panel{position:relative;}
+#mob-code-panel.active{display:flex;flex-direction:column;}
+#mob-code-panel.active #ed-panel{
+  display:flex!important;flex-direction:column;
+  position:absolute;inset:0;height:100%;width:100%;
+  overflow:hidden;
+}
+#mob-code-panel.active #py-mode,
+#mob-code-panel.active #web-mode,
+#mob-code-panel.active #sql-mode,
+#mob-code-panel.active #git-mode{flex:1;min-height:0;}
+#mob-code-panel.active .ed-wrap,
+#mob-code-panel.active .web-ed-wrap,
+#mob-code-panel.active .sql-ed-wrap{flex:1;min-height:0;overflow:hidden;}
+#mob-code-panel.active #code-ed,
+#mob-code-panel.active #web-ed,
+#mob-code-panel.active #sql-ed{height:100%;}
+#mob-code-panel.active .out-wrap{flex-shrink:0;height:42%;}
+#mob-code-panel.active .git-term{flex:1;min-height:0;}
+
+/* XP popup + confetti */
+.xp-popup{position:fixed;pointer-events:none;z-index:9998;font-weight:800;font-size:16px;color:#f5c518;text-shadow:0 0 12px rgba(245,197,24,.5);animation:xpup 1.3s ease-out forwards;font-family:var(--font);}
+@keyframes xpup{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:1;transform:translateY(-55px) scale(1.25)}100%{opacity:0;transform:translateY(-85px) scale(.9)}}
+.cfp{position:fixed;pointer-events:none;z-index:9997;animation:cfall linear forwards;}
+@keyframes cfall{0%{opacity:1;transform:translateY(-10px) rotate(0)}100%{opacity:0;transform:translateY(110vh) rotate(540deg)}}
+
+/* RESPONSIVE — portrait + landscape mobile */
+@media(max-width:767px){
+  .sb,.lesson-pane{display:none!important;}
+  /* ed-panel hidden by default on mobile; shown by JS inside mob-code-panel */
+  #ed-panel{display:none;}
+  .mob-tabs{display:flex;}
+  #lessonscreen{flex-direction:column!important;}
+  .tracks-grid{grid-template-columns:repeat(2,1fr);gap:9px;}
+  .home-top h1{font-size:19px;}
+  .chips .chip-streak,.chips .chip-done{display:none;}
+  .ed-hd{flex-wrap:nowrap;gap:4px;padding:4px 8px;}
+  .btn{padding:4px 8px;font-size:10px;}
+  .ed-file{display:none;}/* save space on small screens */
+  /* Output takes less space on small screens */
+  .out-wrap{height:38%!important;}
+}
+/* Landscape phone */
+@media(max-width:767px) and (orientation:landscape){
+  .mob-tabs{height:38px;}
+  .mob-tab{font-size:8px;}
+  .mob-tab-ico{font-size:13px;}
+  .topbar{height:36px;}
+  .ed-hd{padding:3px 8px;}
+  .btn{padding:3px 7px;font-size:10px;}
+  #mob-code-panel.active #ed-panel{display:flex!important;}
+  /* In landscape, split editor/output side by side */
+  #mob-code-panel.active #py-mode{flex-direction:row!important;}
+  #mob-code-panel.active .ed-wrap{flex:3;}
+  #mob-code-panel.active .out-wrap{
+    flex:2;height:auto!important;
+    border-top:none!important;border-left:1px solid var(--b1);
+  }
+}
+@media(min-width:768px){
+  .mob-tabs,.mob-panel{display:none!important;}
+  .sb,.lesson-pane{display:flex!important;}
+  .lesson-pane{display:block!important;}
+  #ed-panel{display:flex!important;flex-direction:column;flex:1;overflow:hidden;min-width:0;min-height:0;}
+}
+@media(max-width:380px){
+  #code-ed,#web-ed,#sql-ed,.highlight-layer,.web-hl,.sql-hl{font-size:11px;line-height:1.7;}
+  .line-nums,#web-lns,#sql-lns{font-size:11px;line-height:1.7;}
+  .out-body{font-size:11px;}
+}
+
+/* ── DRAG HANDLES ── */
+.drag-h{  /* horizontal drag bar (between editor and output) */
+  height:5px;background:var(--b1);flex-shrink:0;cursor:row-resize;
+  position:relative;transition:background .15s;user-select:none;touch-action:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.drag-h:hover,.drag-h.dragging{background:var(--b3);}
+.drag-h::after{
+  content:'';width:32px;height:3px;border-radius:2px;
+  background:var(--b3);transition:background .15s;
+}
+.drag-h:hover::after,.drag-h.dragging::after{background:var(--py);}
+
+.drag-v{ /* vertical drag bar (between lesson pane and editor, desktop only) */
+  width:5px;background:var(--b1);flex-shrink:0;cursor:col-resize;
+  position:relative;transition:background .15s;user-select:none;touch-action:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.drag-v:hover,.drag-v.dragging{background:var(--b3);}
+.drag-v::after{
+  content:'';width:3px;height:32px;border-radius:2px;
+  background:var(--b3);transition:background .15s;
+}
+.drag-v:hover::after,.drag-v.dragging::after{background:var(--py);}
+</style>
+</head>
+<body>
+<!-- LOADING -->
+<div id="loading">
+  <div class="ld-rings">
+    <div class="ld-ring"></div><div class="ld-ring"></div><div class="ld-ring"></div>
+  </div>
+  <div class="ld-logo">CodeQuest</div>
+  <div class="ld-sub">Learn to Code</div>
+  <div class="ld-bar-wrap"><div class="ld-bar" id="ld-bar"></div></div>
+  <div id="ld-msg">Starting…</div>
+</div>
+
+<div class="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <span class="logo" onclick="goHome()">CodeQuest</span>
+    <button class="back-btn" id="back-btn" onclick="goBack()">← Back</button>
+    <div class="sep"></div>
+    <div class="bc" id="bc">Choose your adventure ⬇️</div>
+    <div class="chips">
+      <div class="chip chip-streak">🔥 <span id="sv">0</span></div>
+      <div class="chip chip-xp">⚡ <span id="xv">0</span></div>
+      <div class="chip chip-done">🏆 <span id="dv">0</span></div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="home">
+    <div class="home-top">
+      <h1>Start Your <span>Coding Adventure</span></h1>
+      <p>Master Python, Web, SQL, Algorithms & AI. Earn XP, complete challenges, build real projects.</p>
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+    <div class="cont-wrap" id="cont-wrap"></div>
+    <div class="lb-wrap" id="lb-wrap"></div>
+    <div class="sec-lbl">All Tracks</div>
+    <div class="tracks-grid" id="tg"></div>
+  </div>
+
+  <!-- TRACK -->
+  <div class="screen" id="trkscreen">
+    <div class="trk-hero" id="trk-hero">
+      <div class="trk-hero-row">
+        <span class="trk-ico" id="ti"></span>
+        <div><div class="trk-name" id="tn"></div><div class="trk-sub" id="ts"></div></div>
+      </div>
+      <div class="trk-bar-wrap"><div class="trk-bar" id="tb"></div></div>
+      <div class="trk-stats" id="trk-stats"></div>
+    </div>
+    <div class="ch-list" id="chl"></div>
+  </div>
+
+  <!-- LESSON -->
+  <div class="screen" id="lessonscreen">
+    <!-- Desktop sidebar -->
+    <aside class="sb" id="sb">
+      <div class="sb-head">
+        <div class="sb-name" id="sb-name"></div>
+        <div class="sb-xp-wrap"><div class="sb-xp-fill" id="sb-xf"></div></div>
+        <div class="sb-xp-row"><span id="sb-xn">0 XP</span><span id="sb-xt">/0</span></div>
+      </div>
+      <div class="sb-list" id="sb-list"></div>
+    </aside>
+
+    <!-- Mobile tabs -->
+    <div class="mob-tabs" id="mob-tabs">
+      <div class="mob-tabs-inner">
+        <div class="mob-tab active" id="mt-lesson" onclick="mTab('lesson')"><span class="mob-tab-ico">📖</span>Lesson</div>
+        <div class="mob-tab" id="mt-code" onclick="mTab('code')"><span class="mob-tab-ico">💻</span>Code</div>
+        <div class="mob-tab" id="mt-chs" onclick="mTab('chs')"><span class="mob-tab-ico">📚</span>Chapters</div>
+      </div>
+    </div>
+
+    <!-- Mobile panels -->
+    <div class="mob-panel" id="mob-lesson-panel" style="overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 13px 48px;"></div>
+    <div class="mob-panel" id="mob-code-panel"></div>
+    <div class="mob-panel" id="mob-chs-panel" style="overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+
+    <!-- Desktop lesson -->
+    <div class="lesson-pane" id="lesson-pane"></div>
+    <div class="drag-v" id="drag-v" title="Drag to resize"></div>
+
+    <!-- EDITOR PANEL -->
+    <div class="ed-panel" id="ed-panel">
+      <div class="ed-hd">
+        <span class="ed-file" id="ed-file">main.py</span>
+        <div class="ed-acts">
+          <button class="btn btn-rst" onclick="resetCode()" title="Reset">↺</button>
+          <button class="btn btn-hint" id="btn-hint" onclick="getHint()">💡 Hint</button>
+          <button class="btn btn-check" id="btn-check" onclick="checkAns()">✓ Check</button>
+          <button class="btn btn-run" id="btn-run" onclick="runCode()">▶ Run</button>
+        </div>
+      </div>
+
+      <!-- Python/DSA/AI mode -->
+      <div id="py-mode" style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0;">
+        <div class="ed-wrap" id="py-ed-wrap">
+          <pre class="highlight-layer" id="hl-py"></pre>
+          <div class="line-nums" id="ln-py">1</div>
+          <textarea id="code-ed" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"></textarea>
+        </div>
+        <div class="drag-h" id="drag-py" title="Drag to resize"></div>
+        <div class="out-wrap" id="py-out-wrap">
+          <div class="out-hd"><span class="out-lbl">Output</span><span class="out-st" id="out-st"></span></div>
+          <div class="out-body" id="out-body"><span class="od">▶ Run code to see output</span></div>
+        </div>
+      </div>
+
+      <!-- Web mode -->
+      <div id="web-mode" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0;">
+        <div class="web-tabs"><div class="web-tab active">HTML</div></div>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100%;">
+          <div class="web-ed-wrap" style="flex:1;overflow:hidden;min-height:0;">
+            <pre class="web-hl" id="hl-web"></pre>
+            <div id="web-lns">1</div>
+            <textarea id="web-ed" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off"></textarea>
+          </div>
+          <div class="drag-h" id="drag-web" title="Drag to resize"></div>
+          <div class="preview-wrap" id="web-preview-wrap">
+            <div class="preview-hd">
+              <span class="preview-lbl">Live Preview</span>
+              <span class="out-st" id="web-st"></span>
+            </div>
+            <iframe id="preview" sandbox="allow-scripts allow-same-origin"></iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- SQL mode -->
+      <div id="sql-mode" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0;">
+        <div class="sql-ed-wrap" id="sql-ed-wrap" style="flex:1;overflow:hidden;min-height:0;">
+          <pre class="sql-hl" id="hl-sql"></pre>
+          <div id="sql-lns">1</div>
+          <textarea id="sql-ed" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off"></textarea>
+        </div>
+        <div class="drag-h" id="drag-sql" title="Drag to resize"></div>
+        <div class="out-wrap" id="sql-out-wrap" style="height:200px;">
+          <div class="out-hd"><span class="out-lbl">Results</span><span class="out-st" id="sql-st"></span></div>
+          <div class="out-body" id="sql-out"><span class="od">▶ Run query to see results</span></div>
+        </div>
+      </div>
+
+      <!-- Git/Concept mode -->
+      <div id="git-mode" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0;">
+        <div class="git-term" id="git-term"></div>
+        <div class="git-input-row">
+          <span class="git-ps1-label">$</span>
+          <input class="git-input" id="git-inp" placeholder="type a git command…" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-wasm.js"></script>
+<script>
+'use strict';
+const TRACKS = [
+  {
+    id: "python",
+    icon: "🐍",
+    name: "Python",
+    sub: "The Legend of Python",
+    color: "#3b82f6",
+    type: "python",
+    badge: "Beginner",
+    chapters: [
+      {
+        id: "py1",
+        icon: "👋",
+        title: "Hello, World!",
+        xp: 50,
+        sub: "Your very first Python program",
+        theory: "<p>Python is the world's most popular language — used in game dev, AI, websites, and data science.<\/p><h3>print()<\/h3><p>The <code>print()<\/code> function displays text on your screen. Wrap text in quotes to make a <em>string<\/em>.<\/p><div class='callout'>💡 By tradition every programmer's first program prints \"Hello, World!\" — a rite of passage since 1972.<\/div><h3>Comments<\/h3><p>Lines starting with <code>#<\/code> are ignored by Python. Use them to explain your code.<\/p>",
+        ex: "# My first Python program\nprint(\"Hello, World!\")\nprint(\"I am learning Python!\")\nprint(\"This\", \"is\", \"awesome!\")",
+        ch: {
+          title: "👋 Introduce yourself",
+          desc: "Print two lines: your name on line 1, and <strong>\"I am learning Python!\"<\/strong> on line 2.",
+          exp: "Cheese\nI am learning Python!",
+          start: "# Print your name:\nprint(\"...\")\n\n# Print this exact text:\nprint(\"...\")",
+          ok: (o,raw) => o.includes('I am learning Python') && o.trim().split('\n').length >= 2,
+        },
+      },
+      {
+        id: "py2",
+        icon: "📦",
+        title: "Variables",
+        xp: 60,
+        sub: "Storing information in named boxes",
+        theory: "<p>Variables store values so you can reuse and change them.<\/p><div class='op-grid'><div class='op-row'><code>name = \"Alice\"<\/code> → text (str)<\/div><div class='op-row'><code>age = 17<\/code> → whole number (int)<\/div><div class='op-row'><code>gpa = 3.8<\/code> → decimal (float)<\/div><div class='op-row'><code>active = True<\/code> → yes/no (bool)<\/div><\/div><h3>f-strings<\/h3><p>Add <code>f<\/code> before a string and use <code>{variable}<\/code> to inject values.<\/p><div class='callout'>💡 f\"Hi {name}, you are {age}!\"<\/div>",
+        ex: "name = \"Alex\"\nage = 17\nheight = 1.72\nis_student = True\nprint(name)\nprint(age)\nprint(f\"Hi! I'm {name}, I'm {age} years old.\")",
+        ch: {
+          title: "📦 Profile Card",
+          desc: "Create 3 variables: <code>name<\/code>, <code>age<\/code>, <code>hobby<\/code>. Print: <strong>\"I am [name], aged [age], and I love [hobby].\"<\/strong>",
+          exp: "I am Cheese, aged 18, and I love coding.",
+          start: "name = \"\"\nage = 0\nhobby = \"\"\nprint(f\"I am {name}, aged {age}, and I love {hobby}.\")",
+          ok: (o,raw) => /i am .+, aged \d+, and i love .+/i.test(o),
+        },
+      },
+      {
+        id: "py3",
+        icon: "🔢",
+        title: "Numbers & Math",
+        xp: 60,
+        sub: "Python as a calculator",
+        theory: "<p>Python handles all arithmetic cleanly.<\/p><div class='op-grid'><div class='op-row'><code>+<\/code> Add &nbsp;<code>-<\/code> Subtract<\/div><div class='op-row'><code>*<\/code> Multiply &nbsp;<code>/<\/code> Divide<\/div><div class='op-row'><code>//<\/code> Floor div &nbsp;<code>%<\/code> Remainder<\/div><div class='op-row'><code>**<\/code> Power &nbsp;<code>round(x,n)<\/code> Round<\/div><\/div><div class='callout'>💡 BODMAS applies. Use parentheses: (2+3)*4 = 20<\/div>",
+        ex: "print(10 + 5)\nprint(22 / 7)\nprint(22 // 7)\nprint(2 ** 10)\nprint(round(22/7, 4))",
+        ch: {
+          title: "🔢 BMI Calculator",
+          desc: "Calculate BMI: <code>bmi = weight / (height ** 2)<\/code>. Use <code>weight=70<\/code>, <code>height=1.75<\/code>. Print rounded to 2 decimals.",
+          exp: "22.86",
+          start: "weight = 70\nheight = 1.75\nbmi = weight / (height ** 2)\nprint(round(bmi, 2))",
+          ok: (o,raw) => o.includes('22.86'),
+        },
+      },
+      {
+        id: "py4",
+        icon: "📝",
+        title: "Strings",
+        xp: 75,
+        sub: "Mastering text manipulation",
+        theory: "<p>Strings are sequences of characters with a rich set of built-in methods.<\/p><div class='op-grid'><div class='op-row'><code>len(s)<\/code> length<\/div><div class='op-row'><code>s.upper()<\/code> UPPERCASE<\/div><div class='op-row'><code>s.lower()<\/code> lowercase<\/div><div class='op-row'><code>s.strip()<\/code> trim spaces<\/div><div class='op-row'><code>s.replace(a,b)<\/code> swap<\/div><div class='op-row'><code>s.count(x)<\/code> occurrences<\/div><div class='op-row'><code>s[0]<\/code> first char<\/div><div class='op-row'><code>s[-1]<\/code> last char<\/div><div class='op-row'><code>s[0:3]<\/code> slice<\/div><div class='op-row'><code>s.split(\" \")<\/code> split to list<\/div><\/div>",
+        ex: "word = \"Python\"\nprint(len(word))\nprint(word.upper())\nprint(word[0:3])\nmsg = \"I love coding\"\nprint(msg.replace(\"coding\",\"Python!\"))\nprint(msg.count(\"o\"))",
+        ch: {
+          title: "📝 String Inspector",
+          desc: "Set <code>word = \"extraordinary\"<\/code>. Print: (1) its length, (2) UPPERCASE, (3) count of letter <code>\"r\"<\/code>.",
+          exp: "13\nEXTRAORDINARY\n3",
+          start: "word = \"extraordinary\"\nprint(len(word))\nprint(word.upper())\nprint(word.count(\"r\"))",
+          ok: (o,raw) => o.includes('13') && o.includes('EXTRAORDINARY') && o.includes('3'),
+        },
+      },
+      {
+        id: "py5",
+        icon: "🤔",
+        title: "If / Else",
+        xp: 75,
+        sub: "Making decisions in code",
+        theory: "<p>Programs need to make choices. Python uses <code>if<\/code>, <code>elif<\/code>, and <code>else<\/code>.<\/p><div class='callout'>⚠️ Python uses INDENTATION (4 spaces) instead of curly braces — mandatory!<\/div><div class='op-grid'><div class='op-row'><code>==<\/code> equal &nbsp;<code>!=<\/code> not equal<\/div><div class='op-row'><code>&gt;<\/code> greater &nbsp;<code>&lt;<\/code> less<\/div><div class='op-row'><code>&gt;=<\/code> &ge; &nbsp;<code>&lt;=<\/code> &le;<\/div><div class='op-row'><code>and<\/code> both true &nbsp;<code>or<\/code> either<\/div><\/div>",
+        ex: "score = 85\nif score >= 90:\n    print(\"A — Excellent!\")\nelif score >= 75:\n    print(\"B — Good job!\")\nelif score >= 60:\n    print(\"C — Passing\")\nelse:\n    print(\"F — Keep trying!\")",
+        ch: {
+          title: "🤔 Temperature Check",
+          desc: "Set <code>temp = 38<\/code>. Print <strong>\"Freezing!\"<\/strong> if below 0, <strong>\"Cold\"<\/strong> if below 15, <strong>\"Warm\"<\/strong> if below 30, <strong>\"Hot!\"<\/strong> otherwise.",
+          exp: "Hot!",
+          start: "temp = 38\nif temp < 0:\n    print(\"Freezing!\")\nelif temp < 15:\n    print(\"Cold\")\nelif temp < 30:\n    print(\"Warm\")\nelse:\n    print(\"Hot!\")",
+          ok: (o,raw) => o.trim() === 'Hot!',
+        },
+      },
+      {
+        id: "py6",
+        icon: "🔁",
+        title: "For Loops",
+        xp: 75,
+        sub: "Automating repetition",
+        theory: "<p>Loops repeat code automatically.<\/p><div class='op-grid'><div class='op-row'><code>range(5)<\/code> → 0,1,2,3,4<\/div><div class='op-row'><code>range(1,6)<\/code> → 1,2,3,4,5<\/div><div class='op-row'><code>range(0,10,2)<\/code> → 0,2,4,6,8<\/div><div class='op-row'><code>range(10,0,-1)<\/code> countdown<\/div><\/div><div class='callout'>💡 The loop variable (often <code>i<\/code>) gets each value automatically.<\/div>",
+        ex: "for i in range(5):\n    print(f\"Step {i}\")\n\ntotal = 0\nfor n in range(1, 101):\n    total += n\nprint(f\"Sum 1-100: {total}\")",
+        ch: {
+          title: "🔁 Times Table",
+          desc: "Print the 7 times table from 7x1 to 7x10. Format exactly: <strong>7 x 1 = 7<\/strong>",
+          exp: "7 x 1 = 7\n...\n7 x 10 = 70",
+          start: "for i in range(1, 11):\n    print(f\"7 x {i} = {7*i}\")",
+          ok: (o,raw) => o.includes('7 x 1 = 7') && o.includes('7 x 10 = 70'),
+        },
+      },
+      {
+        id: "py7",
+        icon: "📋",
+        title: "Lists",
+        xp: 100,
+        sub: "Ordered collections",
+        theory: "<p>A list holds multiple values in order. Items can be added, removed, and changed.<\/p><div class='callout'>💡 fruits = [\"apple\",\"mango\",\"cherry\"] — zero-indexed: fruits[0] → \"apple\"<\/div><div class='op-grid'><div class='op-row'><code>list.append(x)<\/code> add to end<\/div><div class='op-row'><code>list.remove(x)<\/code> remove value<\/div><div class='op-row'><code>list.sort()<\/code> sort in place<\/div><div class='op-row'><code>len(list)<\/code> count items<\/div><div class='op-row'><code>x in list<\/code> check exists<\/div><div class='op-row'><code>list[1:3]<\/code> slice<\/div><\/div>",
+        ex: "games = [\"Minecraft\",\"Satisfactory\",\"Celeste\"]\nprint(len(games))\ngames.append(\"Hollow Knight\")\ngames.sort()\nfor g in games:\n    print(f\"  🎮 {g}\")",
+        ch: {
+          title: "📋 Top 5 Songs",
+          desc: "Create a list <code>playlist<\/code> with 5 songs. Print: (1) <strong>\"Songs: 5\"<\/strong>, (2) first song, (3) last song, (4) each numbered like <strong>\"1. Song\"<\/strong>.",
+          exp: "Songs: 5\n1. ...\n5. ...",
+          start: "playlist = [\"Song A\",\"Song B\",\"Song C\",\"Song D\",\"Song E\"]\nprint(f\"Songs: {len(playlist)}\")\nprint(f\"First: {playlist[0]}\")\nprint(f\"Last: {playlist[-1]}\")\nfor i in range(len(playlist)):\n    print(f\"{i+1}. {playlist[i]}\")",
+          ok: (o,raw) => o.includes('Songs: 5') && o.includes('1.') && o.includes('5.'),
+        },
+      },
+      {
+        id: "py8",
+        icon: "📚",
+        title: "Dictionaries",
+        xp: 100,
+        sub: "Key-value data storage",
+        theory: "<p>Dictionaries store data as key-value pairs — like a real dictionary.<\/p><div class='callout'>💡 person = {\"name\": \"Alice\", \"age\": 17}<\/div><div class='op-grid'><div class='op-row'><code>d[\"key\"]<\/code> get value<\/div><div class='op-row'><code>d[\"key\"] = v<\/code> set value<\/div><div class='op-row'><code>d.get(\"k\",\"?\")<\/code> safe get<\/div><div class='op-row'><code>\"key\" in d<\/code> check exists<\/div><div class='op-row'><code>d.keys()<\/code> all keys<\/div><div class='op-row'><code>d.items()<\/code> key,value pairs<\/div><\/div>",
+        ex: "player = {\"name\":\"Hero\",\"hp\":100,\"level\":1}\nprint(player[\"name\"])\nplayer[\"level\"] = 2\nplayer[\"gold\"] = 50\nfor key, val in player.items():\n    print(f\"  {key}: {val}\")",
+        ch: {
+          title: "📚 Contact Card",
+          desc: "Create a dict <code>contact<\/code> with <code>name<\/code>, <code>email<\/code>, <code>phone<\/code>. Print each as <strong>\"Name: Alice\"<\/strong>.",
+          exp: "Name: Alice\nEmail: ...\nPhone: ...",
+          start: "contact = {\n    \"name\": \"Alice\",\n    \"email\": \"alice@example.com\",\n    \"phone\": \"555-1234\"\n}\nfor key, val in contact.items():\n    print(f\"{key.capitalize()}: {val}\")",
+          ok: (o,raw) => o.toLowerCase().includes('name:') && o.toLowerCase().includes('email:') && o.toLowerCase().includes('phone:'),
+        },
+      },
+      {
+        id: "py9",
+        icon: "⚙️",
+        title: "Functions",
+        xp: 125,
+        sub: "Reusable blocks of code",
+        theory: "<p>Functions let you write code once and reuse it anywhere.<\/p><div class='callout'>Use <code>def<\/code> + name + params in () + colon. Body MUST be indented.<\/div><div class='op-grid'><div class='op-row'><code>def add(a,b):<\/code> define<\/div><div class='op-row'><code>return a+b<\/code> send result back<\/div><div class='op-row'><code>result=add(3,5)<\/code> → 8<\/div><div class='op-row'><code>def hi(name=\"World\"):<\/code> default param<\/div><\/div>",
+        ex: "def greet(name=\"World\"):\n    return f\"Hello, {name}!\"\n\ndef power(base, exp=2):\n    return base ** exp\n\nprint(greet())\nprint(greet(\"Cheese\"))\nprint(power(3))\nprint(power(2,10))",
+        ch: {
+          title: "⚙️ Calculator Function",
+          desc: "Write <code>calculate(a, b, op)<\/code> where op is <code>\"+\"<\/code>, <code>\"-\"<\/code>, <code>\"*\"<\/code>, <code>\"/\"<\/code>. Test: (10,3,\"+\")=13, (10,3,\"*\")=30, (10,3,\"-\")=7.",
+          exp: "13\n30\n7",
+          start: "def calculate(a, b, op):\n    if op == \"+\": return a + b\n    elif op == \"-\": return a - b\n    elif op == \"*\": return a * b\n    elif op == \"/\": return a / b\n\nprint(calculate(10, 3, \"+\"))\nprint(calculate(10, 3, \"*\"))\nprint(calculate(10, 3, \"-\"))",
+          ok: (o,raw) => o.includes('13') && o.includes('30') && o.includes('7'),
+        },
+      },
+      {
+        id: "py10",
+        icon: "🏆",
+        title: "Project: Number Guesser",
+        xp: 200,
+        sub: "Build a complete game",
+        isProject: true,
+        theory: "<p>Time to build your first real project! A number-guessing game uses everything: variables, if/else, loops, and functions.<\/p><h3>What you will build<\/h3><p>A game where the program picks a secret number and tells you if your guess is too high, too low, or correct. We simulate it with a fixed sequence of guesses.<\/p>",
+        ex: "def play_game(secret, guesses):\n    for i, guess in enumerate(guesses, 1):\n        if guess < secret:\n            print(f\"Guess {guess}: Too low!\")\n        elif guess > secret:\n            print(f\"Guess {guess}: Too high!\")\n        else:\n            print(f\"Guess {guess}: Correct in {i} attempts!\")\n            return i\n    print(\"Out of guesses!\")\n    return -1\n\nplay_game(42, [20, 60, 35, 50, 42])",
+        ch: {
+          title: "🏆 Build the Game",
+          desc: "Set <code>secret = 7<\/code>. Create a <code>guesses<\/code> list that finds 7 in 3 or fewer attempts. Print <strong>\"Won in 3 attempts or less\"<\/strong> at the end.",
+          exp: "Won in 3 attempts or less",
+          start: "def play_game(secret, guesses):\n    for i, guess in enumerate(guesses, 1):\n        if guess < secret:\n            print(f\"Guess {guess}: Too low!\")\n        elif guess > secret:\n            print(f\"Guess {guess}: Too high!\")\n        else:\n            print(f\"Correct in {i} attempts!\")\n            if i <= 3:\n                print(\"Won in 3 attempts or less\")\n            return\n    print(\"Out of guesses!\")\n\nplay_game(7, [5, 8, 7])",
+          ok: (o,raw) => o.includes('Won in 3 attempts or less'),
+        },
+      },
+    ],
+  },
+  {
+    id: "html",
+    icon: "🌋",
+    name: "HTML",
+    sub: "The Origins I: HTML",
+    color: "#f97316",
+    type: "web",
+    badge: "Beginner",
+    chapters: [
+      {
+        id: "h1",
+        icon: "📄",
+        title: "What is HTML?",
+        xp: 50,
+        sub: "The skeleton of every webpage",
+        theory: "<p>HTML (HyperText Markup Language) is the standard language for creating webpages. Every website you have ever visited is built on HTML.<\/p><h3>Structure<\/h3><p>HTML uses <em>tags<\/em> — keywords wrapped in angle brackets. Most tags come in pairs: opening <code>&lt;tag&gt;<\/code> and closing <code>&lt;/tag&gt;<\/code>.<\/p><div class='callout'>💡 A basic HTML page always has: &lt;!DOCTYPE html&gt;, &lt;html&gt;, &lt;head&gt;, and &lt;body&gt;.<\/div>",
+        ex: "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <title>My First Page<\/title>\n<\/head>\n<body>\n  <h1>Hello, World!<\/h1>\n  <p>This is my first webpage!<\/p>\n<\/body>\n<\/html>",
+        ch: {
+          title: "🌋 My First Page",
+          desc: "Create an HTML page with a <code>&lt;title&gt;<\/code> of \"My Page\", an <code>&lt;h1&gt;<\/code> heading, and a <code>&lt;p&gt;<\/code> paragraph.",
+          exp: "Has h1 and p tags",
+          start: "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <title>My Page<\/title>\n<\/head>\n<body>\n  <h1>My Heading<\/h1>\n  <p>My paragraph here.<\/p>\n<\/body>\n<\/html>",
+          ok: (o,raw) => c.includes('<h1>') && c.includes('<p>'),
+        },
+      },
+      {
+        id: "h2",
+        icon: "📰",
+        title: "Headings & Text",
+        xp: 60,
+        sub: "Structuring content with tags",
+        theory: "<p>HTML has 6 levels of headings (h1–h6) and several text formatting tags.<\/p><div class='op-grid'><div class='op-row'><code>&lt;h1&gt;<\/code> biggest heading<\/div><div class='op-row'><code>&lt;h6&gt;<\/code> smallest heading<\/div><div class='op-row'><code>&lt;p&gt;<\/code> paragraph<\/div><div class='op-row'><code>&lt;strong&gt;<\/code> bold<\/div><div class='op-row'><code>&lt;em&gt;<\/code> italic<\/div><div class='op-row'><code>&lt;br&gt;<\/code> line break<\/div><div class='op-row'><code>&lt;hr&gt;<\/code> horizontal rule<\/div><div class='op-row'><code>&lt;mark&gt;<\/code> highlight<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Text Demo<\/title><\/head>\n<body>\n  <h1>Main Title<\/h1>\n  <h2>Subtitle<\/h2>\n  <p>This is <strong>bold<\/strong> and <em>italic<\/em>.<\/p>\n  <p>Line one.<br>Line two.<\/p>\n  <hr>\n  <p><mark>Highlighted!<\/mark><\/p>\n<\/body><\/html>",
+        ch: {
+          title: "📰 Article Layout",
+          desc: "Create a page with: <code>&lt;h1&gt;<\/code>, <code>&lt;h2&gt;<\/code>, a <code>&lt;p&gt;<\/code> with <code>&lt;strong&gt;<\/code>, and a <code>&lt;p&gt;<\/code> with <code>&lt;em&gt;<\/code>.",
+          exp: "Has h1, h2, strong, em",
+          start: "<!DOCTYPE html>\n<html><head><title>Article<\/title><\/head>\n<body>\n  <h1>Article Title<\/h1>\n  <h2>By the Author<\/h2>\n  <p>This word is <strong>important<\/strong>.<\/p>\n  <p>This word is <em>emphasized<\/em>.<\/p>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('<h1>') && c.includes('<h2>') && c.includes('<strong>') && c.includes('<em>'),
+        },
+      },
+      {
+        id: "h3",
+        icon: "🔗",
+        title: "Links & Images",
+        xp: 75,
+        sub: "Connecting pages and adding media",
+        theory: "<p>Links and images are what make the web the web.<\/p><h3>Links — &lt;a&gt;<\/h3><p>The <code>href<\/code> attribute sets the destination. <code>target=\"_blank\"<\/code> opens in a new tab.<\/p><div class='callout'>💡 &lt;a href=\"https://example.com\"&gt;Click me&lt;/a&gt;<\/div><h3>Images — &lt;img&gt;<\/h3><p><code>src<\/code> = image URL, <code>alt<\/code> = description for accessibility. Self-closing — no closing tag.<\/p>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Links & Images<\/title><\/head>\n<body>\n  <h1>Links & Images<\/h1>\n  <p>Visit <a href=\"https://www.google.com\" target=\"_blank\">Google<\/a>!<\/p>\n  <br>\n  <img src=\"https://picsum.photos/200/100\" alt=\"Random photo\" width=\"200\">\n<\/body><\/html>",
+        ch: {
+          title: "🔗 Link & Image",
+          desc: "Create a page with a link using <code>&lt;a href=\"...\"&gt;<\/code> and an image using <code>&lt;img src=\"https://picsum.photos/200/100\" alt=\"photo\"&gt;<\/code>.",
+          exp: "Has a and img tags",
+          start: "<!DOCTYPE html>\n<html><head><title>Links<\/title><\/head>\n<body>\n  <h1>My Links<\/h1>\n  <a href=\"https://example.com\">Visit Example<\/a>\n  <br><br>\n  <img src=\"https://picsum.photos/200/100\" alt=\"A photo\">\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('<a ') && c.includes('<img '),
+        },
+      },
+      {
+        id: "h4",
+        icon: "📋",
+        title: "Lists",
+        xp: 75,
+        sub: "Ordered and unordered content",
+        theory: "<p>HTML has two types of lists.<\/p><h3>Unordered list — &lt;ul&gt;<\/h3><p>Bullet points. Each item goes in an <code>&lt;li&gt;<\/code> tag.<\/p><h3>Ordered list — &lt;ol&gt;<\/h3><p>Numbered automatically. Same structure with <code>&lt;li&gt;<\/code> items. Lists can be nested.<\/p>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Lists<\/title><\/head>\n<body>\n  <h2>Shopping List<\/h2>\n  <ul>\n    <li>Apples<\/li>\n    <li>Bread<\/li>\n    <li>Coffee<\/li>\n  <\/ul>\n  <h2>Steps<\/h2>\n  <ol>\n    <li>Boil water<\/li>\n    <li>Add coffee grounds<\/li>\n    <li>Pour and enjoy<\/li>\n  <\/ol>\n<\/body><\/html>",
+        ch: {
+          title: "📋 My Top 5",
+          desc: "Create a page with an <code>&lt;ol&gt;<\/code> ordered list of your 5 favourite things. Each must be in an <code>&lt;li&gt;<\/code>.",
+          exp: "Has ol with 5 li items",
+          start: "<!DOCTYPE html>\n<html><head><title>Top 5<\/title><\/head>\n<body>\n  <h1>My Top 5<\/h1>\n  <ol>\n    <li>First thing<\/li>\n    <li>Second thing<\/li>\n    <li>Third thing<\/li>\n    <li>Fourth thing<\/li>\n    <li>Fifth thing<\/li>\n  <\/ol>\n<\/body><\/html>",
+          ok: (o,raw) => (c.match(/<li>/g)||[]).length >= 5 && c.includes('<ol>'),
+        },
+      },
+      {
+        id: "h5",
+        icon: "📊",
+        title: "Tables & Forms",
+        xp: 100,
+        sub: "Data and user input",
+        theory: "<p>Tables display structured data. Forms collect user input.<\/p><h3>Tables<\/h3><p><code>&lt;table&gt;<\/code> → <code>&lt;tr&gt;<\/code> (row) → <code>&lt;th&gt;<\/code> (header) or <code>&lt;td&gt;<\/code> (cell)<\/p><h3>Forms<\/h3><p>Common types: <code>text<\/code>, <code>email<\/code>, <code>password<\/code>, <code>number<\/code>, <code>checkbox<\/code>, <code>submit<\/code>.<\/p>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Table & Form<\/title><\/head>\n<body>\n  <h2>Scores<\/h2>\n  <table border=\"1\" style=\"border-collapse:collapse;padding:8px\">\n    <tr><th>Name<\/th><th>Score<\/th><\/tr>\n    <tr><td>Alice<\/td><td>95<\/td><\/tr>\n    <tr><td>Bob<\/td><td>87<\/td><\/tr>\n  <\/table>\n  <h2>Sign Up<\/h2>\n  <form>\n    <label>Name: <input type=\"text\" placeholder=\"Your name\"><\/label><br><br>\n    <button type=\"submit\">Submit<\/button>\n  <\/form>\n<\/body><\/html>",
+        ch: {
+          title: "📊 Data Table",
+          desc: "Create a table with 3 columns: Name, Age, City. Add at least 3 data rows using <code>&lt;th&gt;<\/code> for headers and <code>&lt;td&gt;<\/code> for data.",
+          exp: "Has table with th and td",
+          start: "<!DOCTYPE html>\n<html><head><title>My Table<\/title><\/head>\n<body>\n  <h1>People<\/h1>\n  <table border=\"1\" style=\"border-collapse:collapse\">\n    <tr><th>Name<\/th><th>Age<\/th><th>City<\/th><\/tr>\n    <tr><td>Alice<\/td><td>25<\/td><td>Mumbai<\/td><\/tr>\n    <tr><td>Bob<\/td><td>30<\/td><td>Delhi<\/td><\/tr>\n    <tr><td>Carol<\/td><td>22<\/td><td>Pune<\/td><\/tr>\n  <\/table>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('<th>') && c.includes('<td>') && (c.match(/<tr>/g)||[]).length >= 4,
+        },
+      },
+      {
+        id: "h6",
+        icon: "🏷️",
+        title: "Semantic HTML",
+        xp: 100,
+        sub: "Meaningful structure for modern web",
+        theory: "<p>Semantic HTML uses tags that describe their meaning — important for SEO and accessibility.<\/p><div class='op-grid'><div class='op-row'><code>&lt;header&gt;<\/code> page top<\/div><div class='op-row'><code>&lt;nav&gt;<\/code> navigation<\/div><div class='op-row'><code>&lt;main&gt;<\/code> main content<\/div><div class='op-row'><code>&lt;article&gt;<\/code> independent piece<\/div><div class='op-row'><code>&lt;section&gt;<\/code> themed group<\/div><div class='op-row'><code>&lt;aside&gt;<\/code> sidebar<\/div><div class='op-row'><code>&lt;footer&gt;<\/code> page bottom<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html lang=\"en\"><head><title>Semantic Page<\/title><\/head>\n<body>\n  <header>\n    <h1>My Blog<\/h1>\n    <nav><a href=\"#\">Home<\/a> | <a href=\"#\">About<\/a><\/nav>\n  <\/header>\n  <main>\n    <article>\n      <h2>Post Title<\/h2>\n      <p>Article content here.<\/p>\n    <\/article>\n  <\/main>\n  <footer><p>© 2025 My Blog<\/p><\/footer>\n<\/body><\/html>",
+        ch: {
+          title: "🏷️ Semantic Layout",
+          desc: "Build a page using: <code>&lt;header&gt;<\/code>, <code>&lt;nav&gt;<\/code> with 2 links, <code>&lt;main&gt;<\/code> with an <code>&lt;article&gt;<\/code>, and a <code>&lt;footer&gt;<\/code>.",
+          exp: "Has header,nav,main,article,footer",
+          start: "<!DOCTYPE html>\n<html lang=\"en\"><head><title>My Site<\/title><\/head>\n<body>\n  <header><h1>My Site<\/h1><\/header>\n  <nav><a href=\"#\">Home<\/a> | <a href=\"#\">About<\/a><\/nav>\n  <main>\n    <article>\n      <h2>Welcome<\/h2>\n      <p>This is the main content.<\/p>\n    <\/article>\n  <\/main>\n  <footer><p>© 2025<\/p><\/footer>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('<header') && c.includes('<nav') && c.includes('<main') && c.includes('<article') && c.includes('<footer'),
+        },
+      },
+      {
+        id: "h7",
+        icon: "🏆",
+        title: "Project: Personal Website",
+        xp: 250,
+        sub: "Build a full personal site",
+        isProject: true,
+        theory: "<p>Bring everything together to build your own personal website — the kind you would share on a resume.<\/p><h3>Your page should include<\/h3><p>A semantic structure with header, nav, main sections, and footer. Include a profile section, an About Me paragraph, a skills list, and a contact link.<\/p>",
+        ex: "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <title>Cheese — Developer<\/title>\n<\/head>\n<body>\n  <header>\n    <h1>Cheese 🧀<\/h1>\n    <nav>\n      <a href=\"#about\">About<\/a> |\n      <a href=\"#skills\">Skills<\/a> |\n      <a href=\"#contact\">Contact<\/a>\n    <\/nav>\n  <\/header>\n  <main>\n    <section id=\"about\">\n      <h2>About Me<\/h2>\n      <p>Hi! I am a passionate coder learning Python, HTML, and more.<\/p>\n    <\/section>\n    <section id=\"skills\">\n      <h2>Skills<\/h2>\n      <ul>\n        <li>Python 🐍<\/li>\n        <li>HTML 🌋<\/li>\n        <li>CSS 🎨<\/li>\n      <\/ul>\n    <\/section>\n    <section id=\"contact\">\n      <h2>Contact<\/h2>\n      <p><a href=\"mailto:cheese@example.com\">cheese@example.com<\/a><\/p>\n    <\/section>\n  <\/main>\n  <footer><p>Made with ❤️ by Cheese<\/p><\/footer>\n<\/body>\n<\/html>",
+        ch: {
+          title: "🏆 Build Your Site",
+          desc: "Create your personal website with at least: a <code>&lt;header&gt;<\/code> with your name, a <code>&lt;section&gt;<\/code> about you, a <code>&lt;ul&gt;<\/code> of 3+ skills, and a <code>&lt;footer&gt;<\/code>.",
+          exp: "Full personal site",
+          start: "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <title>Your Name<\/title>\n<\/head>\n<body>\n  <header>\n    <h1>Your Name<\/h1>\n    <nav><a href=\"#about\">About<\/a> | <a href=\"#skills\">Skills<\/a><\/nav>\n  <\/header>\n  <main>\n    <section id=\"about\">\n      <h2>About Me<\/h2>\n      <p>Write something about yourself!<\/p>\n    <\/section>\n    <section id=\"skills\">\n      <h2>My Skills<\/h2>\n      <ul>\n        <li>HTML<\/li>\n        <li>CSS<\/li>\n        <li>Python<\/li>\n      <\/ul>\n    <\/section>\n  <\/main>\n  <footer><p>Made by You · 2025<\/p><\/footer>\n<\/body>\n<\/html>",
+          ok: (o,raw) => c.includes('<header') && c.includes('<section') && c.includes('<ul>') && c.includes('<footer') && (c.match(/<li>/g)||[]).length >= 3,
+        },
+      },
+    ],
+  },
+  {
+    id: "css",
+    icon: "🎨",
+    name: "CSS",
+    sub: "The Origins II: CSS",
+    color: "#a855f7",
+    type: "web",
+    badge: "Beginner",
+    chapters: [
+      {
+        id: "c1",
+        icon: "🎨",
+        title: "What is CSS?",
+        xp: 50,
+        sub: "Styling your HTML pages",
+        theory: "<p>CSS (Cascading Style Sheets) controls how HTML looks — colors, fonts, spacing, layout.<\/p><h3>CSS rule syntax<\/h3><p><code>selector { property: value; }<\/code><\/p><div class='callout'>💡 Add CSS in a &lt;style&gt; tag inside &lt;head&gt; for internal styles.<\/div>",
+        ex: "<!DOCTYPE html>\n<html><head>\n<title>CSS Intro<\/title>\n<style>\n  body { background: #1a1a2e; color: #e0e0ff; font-family: sans-serif; }\n  h1 { color: #a855f7; font-size: 2em; }\n  p { background: #16213e; padding: 12px; border-radius: 8px; }\n<\/style>\n<\/head>\n<body>\n  <h1>Hello CSS!<\/h1>\n  <p>This paragraph is styled.<\/p>\n<\/body><\/html>",
+        ch: {
+          title: "🎨 Style It Up",
+          desc: "Add a <code>&lt;style&gt;<\/code> block that sets <code>body<\/code> background to a dark color, makes <code>h1<\/code> a bright color, and adds <code>padding<\/code> to <code>p<\/code>.",
+          exp: "Has style tag with body, h1, p styles",
+          start: "<!DOCTYPE html>\n<html><head>\n<title>Styled Page<\/title>\n<style>\n  body { background: #0a0a0a; color: #ffffff; }\n  h1 { color: #a855f7; }\n  p { padding: 10px; }\n<\/style>\n<\/head>\n<body>\n  <h1>My Styled Page<\/h1>\n  <p>This paragraph has padding.<\/p>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('<style>') && c.includes('background') && c.includes('color') && c.includes('padding'),
+        },
+      },
+      {
+        id: "c2",
+        icon: "🎯",
+        title: "Selectors",
+        xp: 75,
+        sub: "Targeting HTML elements precisely",
+        theory: "<p>CSS selectors determine which HTML elements get styled.<\/p><div class='op-grid'><div class='op-row'><code>p<\/code> element type<\/div><div class='op-row'><code>.class<\/code> class selector<\/div><div class='op-row'><code>#id<\/code> ID selector<\/div><div class='op-row'><code>h1, p<\/code> multiple<\/div><div class='op-row'><code>div p<\/code> p inside div<\/div><div class='op-row'><code>a:hover<\/code> hover state<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head>\n<title>Selectors<\/title>\n<style>\n  .highlight { background: yellow; color: black; padding: 4px 8px; border-radius: 4px; }\n  #special { border: 2px solid #a855f7; border-radius: 8px; padding: 12px; color: white; background: #1a1a2e; }\n  a:hover { color: #a855f7; }\n<\/style>\n<\/head>\n<body style=\"background:#0a0a0a;color:#eee;font-family:sans-serif;padding:20px\">\n  <p>A <span class=\"highlight\">highlighted<\/span> word.<\/p>\n  <div id=\"special\">This div is special!<\/div>\n  <a href=\"#\" style=\"color:#888\">Hover over me!<\/a>\n<\/body><\/html>",
+        ch: {
+          title: "🎯 Class & ID",
+          desc: "Add a class <code>.card<\/code> with a border and border-radius, and an ID <code>#hero<\/code> with a large font-size. Apply both in your HTML.",
+          exp: "Has .card class and #hero id styles",
+          start: "<!DOCTYPE html>\n<html><head>\n<title>Selectors<\/title>\n<style>\n  .card { border: 1px solid #a855f7; border-radius: 8px; padding: 12px; margin: 8px; }\n  #hero { font-size: 2em; color: #a855f7; }\n<\/style>\n<\/head>\n<body style=\"background:#0a0a0a;color:#eee;font-family:sans-serif;padding:20px\">\n  <h1 id=\"hero\">Hero Title<\/h1>\n  <div class=\"card\">Card one<\/div>\n  <div class=\"card\">Card two<\/div>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('.card') && c.includes('#hero') && c.includes('border-radius'),
+        },
+      },
+      {
+        id: "c3",
+        icon: "📦",
+        title: "Box Model",
+        xp: 75,
+        sub: "Space around every element",
+        theory: "<p>Every HTML element is a box. The CSS box model defines how space works.<\/p><div class='callout'>Content → Padding → Border → Margin<\/div><div class='op-grid'><div class='op-row'><code>padding<\/code> inner space<\/div><div class='op-row'><code>margin<\/code> outer space<\/div><div class='op-row'><code>border<\/code> visible edge<\/div><div class='op-row'><code>width / height<\/code> size<\/div><div class='op-row'><code>box-sizing: border-box<\/code> include padding in width<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head>\n<title>Box Model<\/title>\n<style>\n  * { box-sizing: border-box; }\n  .box { width: 200px; height: 100px; background: #a855f7; padding: 20px; margin: 16px; border: 3px solid white; color: white; font-family: sans-serif; }\n<\/style>\n<\/head>\n<body style=\"background:#0a0a0a\">\n  <div class=\"box\">Content inside box<\/div>\n<\/body><\/html>",
+        ch: {
+          title: "📦 Centered Card",
+          desc: "Create a <code>.card<\/code> with <code>width: 250px<\/code>, <code>padding: 20px<\/code>, <code>margin: 40px auto<\/code> (centered), a visible border, and a border-radius.",
+          exp: "Centered card with padding and border",
+          start: "<!DOCTYPE html>\n<html><head>\n<title>Card<\/title>\n<style>\n  * { box-sizing: border-box; }\n  body { background: #0a0a0a; color: #eee; font-family: sans-serif; }\n  .card {\n    width: 250px;\n    padding: 20px;\n    margin: 40px auto;\n    border: 1px solid #a855f7;\n    border-radius: 12px;\n    background: #1a1a2e;\n  }\n<\/style>\n<\/head>\n<body>\n  <div class=\"card\">\n    <h2>My Card<\/h2>\n    <p>A styled card component.<\/p>\n  <\/div>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('padding') && c.includes('border-radius') && c.includes('margin'),
+        },
+      },
+      {
+        id: "c4",
+        icon: "📐",
+        title: "Flexbox",
+        xp: 100,
+        sub: "Modern one-dimensional layouts",
+        theory: "<p>Flexbox is the modern CSS layout system for arranging items in rows or columns.<\/p><div class='callout'>Add <code>display: flex<\/code> to the parent container.<\/div><div class='op-grid'><div class='op-row'><code>flex-direction<\/code> row/column<\/div><div class='op-row'><code>justify-content<\/code> main axis<\/div><div class='op-row'><code>align-items<\/code> cross axis<\/div><div class='op-row'><code>gap<\/code> space between<\/div><div class='op-row'><code>flex-wrap: wrap<\/code> allow wrapping<\/div><div class='op-row'><code>flex: 1<\/code> grow to fill<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head>\n<title>Flexbox<\/title>\n<style>\n  body { background: #0a0a0a; font-family: sans-serif; margin: 20px; }\n  .nav { display: flex; justify-content: space-between; align-items: center; background: #1a1a2e; padding: 12px 20px; border-radius: 8px; }\n  .nav a { color: #a855f7; text-decoration: none; }\n  .cards { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }\n  .card { flex: 1; min-width: 100px; background: #1a1a2e; padding: 16px; border-radius: 8px; color: #eee; text-align: center; }\n<\/style>\n<\/head>\n<body>\n  <nav class=\"nav\">\n    <span style=\"color:#fff;font-weight:bold\">MySite<\/span>\n    <div><a href=\"#\">Home<\/a> &nbsp;<a href=\"#\">About<\/a> &nbsp;<a href=\"#\">Contact<\/a><\/div>\n  <\/nav>\n  <div class=\"cards\">\n    <div class=\"card\">Card 1<\/div>\n    <div class=\"card\">Card 2<\/div>\n    <div class=\"card\">Card 3<\/div>\n  <\/div>\n<\/body><\/html>",
+        ch: {
+          title: "📐 Navigation Bar",
+          desc: "Build a navbar using <code>display: flex<\/code> with <code>justify-content: space-between<\/code>. Left: a logo. Right: 3 links with a <code>gap<\/code>.",
+          exp: "Flex navbar with logo and links",
+          start: "<!DOCTYPE html>\n<html><head>\n<title>Navbar<\/title>\n<style>\n  * { box-sizing: border-box; margin: 0; }\n  body { background: #0a0a0a; font-family: sans-serif; }\n  .navbar {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    padding: 14px 24px;\n    background: #1a1a2e;\n  }\n  .logo { color: #a855f7; font-weight: bold; font-size: 1.2em; }\n  .links { display: flex; gap: 20px; }\n  .links a { color: #ccc; text-decoration: none; }\n  .links a:hover { color: #a855f7; }\n<\/style>\n<\/head>\n<body>\n  <nav class=\"navbar\">\n    <div class=\"logo\">MyBrand<\/div>\n    <div class=\"links\">\n      <a href=\"#\">Home<\/a>\n      <a href=\"#\">Work<\/a>\n      <a href=\"#\">Contact<\/a>\n    <\/div>\n  <\/nav>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('flex') && c.includes('justify-content') && c.includes('gap'),
+        },
+      },
+      {
+        id: "c5",
+        icon: "📏",
+        title: "CSS Grid",
+        xp: 100,
+        sub: "Two-dimensional layouts",
+        theory: "<p>While Flexbox handles one direction, CSS Grid handles both rows and columns at once.<\/p><div class='callout'>Add <code>display: grid<\/code> to the parent.<\/div><div class='op-grid'><div class='op-row'><code>grid-template-columns<\/code> define cols<\/div><div class='op-row'><code>gap<\/code> space between cells<\/div><div class='op-row'><code>repeat(3,1fr)<\/code> 3 equal columns<\/div><div class='op-row'><code>grid-column: span 2<\/code> merge columns<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head>\n<title>CSS Grid<\/title>\n<style>\n  body { background: #0a0a0a; margin: 20px; font-family: sans-serif; color: #eee; }\n  .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }\n  .card { background: #1a1a2e; padding: 20px; border-radius: 8px; text-align: center; }\n  .wide { grid-column: span 2; background: #2a1a4e; }\n  .header { grid-column: span 3; background: #a855f7; color: white; }\n<\/style>\n<\/head>\n<body>\n  <div class=\"grid\">\n    <div class=\"card header\">Header (3 cols)<\/div>\n    <div class=\"card wide\">Wide (2 cols)<\/div>\n    <div class=\"card\">Small<\/div>\n    <div class=\"card\">Item 4<\/div>\n    <div class=\"card\">Item 5<\/div>\n    <div class=\"card\">Item 6<\/div>\n  <\/div>\n<\/body><\/html>",
+        ch: {
+          title: "📏 Photo Grid",
+          desc: "Create a 3-column grid using <code>grid-template-columns: repeat(3, 1fr)<\/code> with a <code>gap<\/code>. Put 6 colored boxes inside.",
+          exp: "3-column grid with 6 items",
+          start: "<!DOCTYPE html>\n<html><head>\n<title>Photo Grid<\/title>\n<style>\n  body { background: #0a0a0a; margin: 20px; }\n  .grid {\n    display: grid;\n    grid-template-columns: repeat(3, 1fr);\n    gap: 12px;\n  }\n  .item {\n    height: 100px;\n    border-radius: 8px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    color: white;\n    font-weight: bold;\n    font-family: sans-serif;\n  }\n<\/style>\n<\/head>\n<body>\n  <div class=\"grid\">\n    <div class=\"item\" style=\"background:#a855f7\">1<\/div>\n    <div class=\"item\" style=\"background:#3b82f6\">2<\/div>\n    <div class=\"item\" style=\"background:#22c55e\">3<\/div>\n    <div class=\"item\" style=\"background:#f97316\">4<\/div>\n    <div class=\"item\" style=\"background:#f43f5e\">5<\/div>\n    <div class=\"item\" style=\"background:#eab308\">6<\/div>\n  <\/div>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('grid') && c.includes('repeat') && (c.match(/class="item"/g)||[]).length >= 6,
+        },
+      },
+      {
+        id: "c6",
+        icon: "✨",
+        title: "Animations & Transitions",
+        xp: 125,
+        sub: "Bringing pages to life",
+        theory: "<p>CSS animations and transitions make your UI feel alive.<\/p><h3>Transitions<\/h3><p>Smoothly animate property changes: <code>transition: all 0.3s ease;<\/code><\/p><h3>Keyframe Animations<\/h3><p>Define multi-step animations with <code>@keyframes<\/code>.<\/p><div class='op-grid'><div class='op-row'><code>animation-name<\/code> keyframe name<\/div><div class='op-row'><code>animation-duration<\/code> how long<\/div><div class='op-row'><code>transform: scale()<\/code> resize<\/div><div class='op-row'><code>transform: rotate()<\/code> spin<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head>\n<title>Animations<\/title>\n<style>\n  body { background: #0a0a0a; display:flex; flex-direction:column; align-items:center; padding:40px; font-family:sans-serif; }\n  .pulse { width:80px; height:80px; background:#a855f7; border-radius:50%; animation: pulse 1.5s ease-in-out infinite; }\n  @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.3);opacity:.7} }\n  .spin { width:60px; height:60px; border:4px solid #1a1a2e; border-top-color:#3b82f6; border-radius:50%; animation: spin 1s linear infinite; margin-top:24px; }\n  @keyframes spin { to{transform:rotate(360deg)} }\n  .btn { margin-top:24px; padding:12px 24px; background:#a855f7; color:white; border:none; border-radius:8px; font-size:15px; cursor:pointer; transition: transform .2s, background .2s; }\n  .btn:hover { transform:scale(1.05); background:#9333ea; }\n<\/style>\n<\/head>\n<body>\n  <div class=\"pulse\"><\/div>\n  <div class=\"spin\"><\/div>\n  <button class=\"btn\">Hover Me!<\/button>\n<\/body><\/html>",
+        ch: {
+          title: "✨ Animated Button",
+          desc: "Create a button that changes background on <code>:hover<\/code> with a smooth <code>transition<\/code>, and scales up with <code>transform: scale(1.05)<\/code>.",
+          exp: "Button with hover transition and scale",
+          start: "<!DOCTYPE html>\n<html><head>\n<title>Button<\/title>\n<style>\n  body { display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; background:#0a0a0a; }\n  .btn {\n    padding: 14px 28px;\n    background: #a855f7;\n    color: white;\n    border: none;\n    border-radius: 8px;\n    font-size: 16px;\n    cursor: pointer;\n    transition: all 0.2s ease;\n  }\n  .btn:hover {\n    background: #7c3aed;\n    transform: scale(1.05);\n  }\n<\/style>\n<\/head>\n<body>\n  <button class=\"btn\">Click Me!<\/button>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('transition') && c.includes('hover') && c.includes('transform'),
+        },
+      },
+      {
+        id: "c7",
+        icon: "🏆",
+        title: "Project: Portfolio Page",
+        xp: 300,
+        sub: "Styled personal portfolio",
+        isProject: true,
+        theory: "<p>Combine HTML + CSS to build a beautiful portfolio page with navigation, hero section, project cards, and footer.<\/p>",
+        ex: "<!DOCTYPE html>\n<html lang=\"en\"><head>\n<title>My Portfolio<\/title>\n<style>\n*{box-sizing:border-box;margin:0;padding:0;}\nbody{background:#0a0a0a;color:#e4e8ff;font-family:-apple-system,sans-serif;}\nnav{display:flex;justify-content:space-between;align-items:center;padding:16px 40px;background:#111;border-bottom:1px solid #222;position:sticky;top:0;}\n.logo{color:#a855f7;font-weight:900;font-size:1.2em;}\n.nav-links{display:flex;gap:24px;}\n.nav-links a{color:#888;text-decoration:none;transition:color .2s;}\n.nav-links a:hover{color:#a855f7;}\n.hero{text-align:center;padding:80px 20px;background:linear-gradient(135deg,#0a0a0a,#1a0a2e);}\n.hero h1{font-size:3em;font-weight:900;color:#a855f7;}\n.hero p{color:#888;margin-top:12px;}\n.projects{padding:60px 40px;}\n.projects h2{text-align:center;margin-bottom:32px;font-size:2em;}\n.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;}\n.card{background:#111;border:1px solid #222;border-radius:12px;padding:20px;transition:border-color .2s,transform .2s;}\n.card:hover{border-color:#a855f7;transform:translateY(-4px);}\n.card-icon{font-size:2em;margin-bottom:8px;}\n.card h3{color:#a855f7;margin-bottom:6px;}\n.card p{color:#666;font-size:.9em;}\nfooter{text-align:center;padding:40px;background:#111;color:#444;border-top:1px solid #222;}\n<\/style><\/head>\n<body>\n<nav>\n  <div class=\"logo\">Cheese.dev<\/div>\n  <div class=\"nav-links\"><a href=\"#\">Home<\/a><a href=\"#projects\">Projects<\/a><a href=\"#\">Contact<\/a><\/div>\n<\/nav>\n<div class=\"hero\">\n  <h1>Hello, I am Cheese 👋<\/h1>\n  <p>Developer · Creator · Learner<\/p>\n<\/div>\n<div class=\"projects\" id=\"projects\">\n  <h2>Projects<\/h2>\n  <div class=\"grid\">\n    <div class=\"card\"><div class=\"card-icon\">🐍<\/div><h3>Python App<\/h3><p>A cool Python project<\/p><\/div>\n    <div class=\"card\"><div class=\"card-icon\">🌋<\/div><h3>HTML Site<\/h3><p>My first website<\/p><\/div>\n    <div class=\"card\"><div class=\"card-icon\">⚡<\/div><h3>JS Game<\/h3><p>Interactive game<\/p><\/div>\n  <\/div>\n<\/div>\n<footer>Made with love by Cheese · 2025<\/footer>\n<\/body><\/html>",
+        ch: {
+          title: "🏆 Your Portfolio",
+          desc: "Build a portfolio with: sticky <code>nav<\/code> using flexbox, a <code>hero<\/code> section, a <code>projects grid<\/code> with 3+ cards, and a <code>footer<\/code>.",
+          exp: "Full portfolio with nav, hero, grid, footer",
+          start: "<!DOCTYPE html>\n<html lang=\"en\"><head>\n<title>My Portfolio<\/title>\n<style>\n*{box-sizing:border-box;margin:0;padding:0;}\nbody{background:#0a0a0a;color:#e4e8ff;font-family:sans-serif;}\nnav{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;background:#111;}\n.hero{text-align:center;padding:60px 20px;}\n.hero h1{font-size:2.5em;color:#a855f7;}\n.projects{padding:40px 32px;}\n.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}\n.card{background:#111;padding:16px;border-radius:8px;border:1px solid #222;}\nfooter{text-align:center;padding:24px;color:#555;}\n<\/style><\/head>\n<body>\n<nav>\n  <div>MyPortfolio<\/div>\n  <div><a href=\"#\" style=\"color:#888\">About<\/a>&nbsp;&nbsp;<a href=\"#\" style=\"color:#888\">Projects<\/a><\/div>\n<\/nav>\n<div class=\"hero\">\n  <h1>Hi, I am [Your Name]<\/h1>\n  <p>Developer and Creator<\/p>\n<\/div>\n<div class=\"projects\">\n  <h2 style=\"margin-bottom:16px\">My Projects<\/h2>\n  <div class=\"grid\">\n    <div class=\"card\"><h3>Project 1<\/h3><p>Description<\/p><\/div>\n    <div class=\"card\"><h3>Project 2<\/h3><p>Description<\/p><\/div>\n    <div class=\"card\"><h3>Project 3<\/h3><p>Description<\/p><\/div>\n  <\/div>\n<\/div>\n<footer>Made by You · 2025<\/footer>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('nav') && c.includes('grid') && (c.match(/class="card"/g)||[]).length >= 3 && c.includes('footer'),
+        },
+      },
+    ],
+  },
+  {
+    id: "javascript",
+    icon: "⚡",
+    name: "JavaScript",
+    sub: "The Origins III: JavaScript",
+    color: "#eab308",
+    type: "web",
+    badge: "Beginner",
+    chapters: [
+      {
+        id: "js1",
+        icon: "💻",
+        title: "Hello JavaScript",
+        xp: 50,
+        sub: "The language of the web",
+        theory: "<p>JavaScript (JS) makes web pages interactive. HTML is structure, CSS is style, JS is behaviour.<\/p><h3>Adding JS to HTML<\/h3><p>Use a <code>&lt;script&gt;<\/code> tag before <code>&lt;/body&gt;<\/code>.<\/p><div class='callout'>💡 Use <code>document.getElementById(id).textContent = '...'<\/code> to update page content from JS.<\/div>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Hello JS<\/title><\/head>\n<body>\n<h1 id=\"title\">Loading...<\/h1>\n<p id=\"info\"><\/p>\n<script>\n  var name = 'Cheese';\n  var year = new Date().getFullYear();\n  document.getElementById('title').textContent = 'Hello, ' + name + '!';\n  document.getElementById('info').textContent = 'Year: ' + year;\n<\/script>\n<\/body><\/html>",
+        ch: {
+          title: "💻 Dynamic Greeting",
+          desc: "Create a page where JS sets an <code>h1<\/code> to \"Hello, [your name]!\" and a <code>p<\/code> to the current year using <code>new Date().getFullYear()<\/code>.",
+          exp: "JS sets h1 and p dynamically",
+          start: "<!DOCTYPE html>\n<html><head><title>JS Greeting<\/title><\/head>\n<body>\n<h1 id=\"greeting\"><\/h1>\n<p id=\"year-p\"><\/p>\n<script>\n  var myName = 'Cheese';\n  document.getElementById('greeting').textContent = 'Hello, ' + myName + '!';\n  document.getElementById('year-p').textContent = 'Year: ' + new Date().getFullYear();\n<\/script>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('getElementById') && (c.includes('textContent') || c.includes('innerHTML')),
+        },
+      },
+      {
+        id: "js2",
+        icon: "📦",
+        title: "Variables & Types",
+        xp: 60,
+        sub: "let, const, and data types",
+        theory: "<p>JS has three ways to declare variables.<\/p><div class='op-grid'><div class='op-row'><code>let<\/code> reassignable variable<\/div><div class='op-row'><code>const<\/code> constant<\/div><div class='op-row'><code>typeof x<\/code> check the type<\/div><\/div><h3>Data types<\/h3><div class='op-grid'><div class='op-row'><code>String<\/code> 'hello'<\/div><div class='op-row'><code>Number<\/code> 42, 3.14<\/div><div class='op-row'><code>Boolean<\/code> true / false<\/div><div class='op-row'><code>Array<\/code> [1,2,3]<\/div><div class='op-row'><code>Object<\/code> {key: value}<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Types<\/title><\/head>\n<body>\n<div id=\"out\"><\/div>\n<script>\n  const PI = 3.14159;\n  let name = 'Alice';\n  let age = 17;\n  let isStudent = true;\n  var html = '<p>Name: ' + name + ' (type: ' + typeof name + ')<\/p>';\n  html += '<p>Age: ' + age + ' (type: ' + typeof age + ')<\/p>';\n  html += '<p>PI: ' + PI + '<\/p>';\n  document.getElementById('out').innerHTML = html;\n<\/script>\n<\/body><\/html>",
+        ch: {
+          title: "📦 Type Explorer",
+          desc: "Declare a <code>const<\/code> for your name and a <code>let<\/code> for your age, then display both plus their <code>typeof<\/code> results on the page.",
+          exp: "Shows name, age and typeof results",
+          start: "<!DOCTYPE html>\n<html><head><title>Types<\/title><\/head>\n<body>\n<div id=\"out\"><\/div>\n<script>\n  const myName = 'Cheese';\n  let myAge = 18;\n  document.getElementById('out').innerHTML =\n    '<p>Name: ' + myName + ' — type: ' + typeof myName + '<\/p>' +\n    '<p>Age: ' + myAge + ' — type: ' + typeof myAge + '<\/p>';\n<\/script>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('typeof') && c.includes('const') && c.includes('let'),
+        },
+      },
+      {
+        id: "js3",
+        icon: "🤔",
+        title: "Conditionals",
+        xp: 75,
+        sub: "if/else and comparisons",
+        theory: "<p>JS conditionals work like Python but use curly braces instead of indentation.<\/p><div class='op-grid'><div class='op-row'><code>===<\/code> strict equal<\/div><div class='op-row'><code>!==<\/code> strict not equal<\/div><div class='op-row'><code>&&<\/code> AND<\/div><div class='op-row'><code>||<\/code> OR<\/div><div class='op-row'><code>!<\/code> NOT<\/div><\/div><h3>Ternary operator<\/h3><p>Short inline if/else: <code>condition ? valueIfTrue : valueIfFalse<\/code><\/p>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Conditionals<\/title><\/head>\n<body>\n<div id=\"out\"><\/div>\n<script>\n  var score = 85;\n  var grade;\n  if (score >= 90) grade = 'A';\n  else if (score >= 75) grade = 'B';\n  else if (score >= 60) grade = 'C';\n  else grade = 'F';\n  var status = score >= 60 ? 'Passing' : 'Failing';\n  document.getElementById('out').innerHTML =\n    '<h2>Score: ' + score + '<\/h2>' +\n    '<p>Grade: ' + grade + '<\/p>' +\n    '<p>Status: ' + status + '<\/p>';\n<\/script>\n<\/body><\/html>",
+        ch: {
+          title: "🤔 Age Checker",
+          desc: "Check an <code>age<\/code> variable. Display <strong>\"Adult (18+)\"<\/strong>, <strong>\"Teen (13-17)\"<\/strong>, or <strong>\"Child\"<\/strong> based on the value.",
+          exp: "Shows correct age category",
+          start: "<!DOCTYPE html>\n<html><head><title>Age Check<\/title><\/head>\n<body>\n<div id=\"result\"><\/div>\n<script>\n  var age = 16;\n  var category;\n  if (age >= 18) {\n    category = 'Adult (18+)';\n  } else if (age >= 13) {\n    category = 'Teen (13-17)';\n  } else {\n    category = 'Child';\n  }\n  document.getElementById('result').innerHTML = '<h2>Age ' + age + ': ' + category + '<\/h2>';\n<\/script>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('if') && c.includes('else') && c.includes('getElementById'),
+        },
+      },
+      {
+        id: "js4",
+        icon: "🔁",
+        title: "Loops & Arrays",
+        xp: 75,
+        sub: "Repeating and collections",
+        theory: "<p>JS loops and arrays are similar to Python lists and for loops.<\/p><div class='op-grid'><div class='op-row'><code>for(let i=0;i&lt;5;i++)<\/code> classic<\/div><div class='op-row'><code>for(let x of arr)<\/code> iterate array<\/div><div class='op-row'><code>arr.forEach(fn)<\/code> array method<\/div><div class='op-row'><code>arr.map(fn)<\/code> transform each<\/div><div class='op-row'><code>arr.filter(fn)<\/code> filter items<\/div><div class='op-row'><code>arr.push(x)<\/code> add to end<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Loops<\/title><\/head>\n<body>\n<div id=\"out\"><\/div>\n<script>\n  var fruits = ['Apple','Mango','Cherry','Banana'];\n  var longNames = fruits.filter(function(f){ return f.length > 5; });\n  var html = '<h2>All: ' + fruits.join(', ') + '<\/h2><ul>';\n  fruits.forEach(function(f, i) { html += '<li>' + (i+1) + '. ' + f + '<\/li>'; });\n  html += '<\/ul><p>Long names: ' + longNames.join(', ') + '<\/p>';\n  document.getElementById('out').innerHTML = html;\n<\/script>\n<\/body><\/html>",
+        ch: {
+          title: "🔁 Number List",
+          desc: "Create array of numbers 1-10. Use <code>.filter()<\/code> to get evens, and <code>.map()<\/code> to square each number. Display all three arrays.",
+          exp: "Shows original, evens, and squares",
+          start: "<!DOCTYPE html>\n<html><head><title>Arrays<\/title><\/head>\n<body>\n<div id=\"out\"><\/div>\n<script>\n  var nums = [1,2,3,4,5,6,7,8,9,10];\n  var evens = nums.filter(function(n){ return n % 2 === 0; });\n  var squares = nums.map(function(n){ return n * n; });\n  document.getElementById('out').innerHTML =\n    '<p>Numbers: ' + nums.join(', ') + '<\/p>' +\n    '<p>Evens: ' + evens.join(', ') + '<\/p>' +\n    '<p>Squares: ' + squares.join(', ') + '<\/p>';\n<\/script>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('filter') && c.includes('map') && c.includes('join'),
+        },
+      },
+      {
+        id: "js5",
+        icon: "🎯",
+        title: "DOM & Events",
+        xp: 100,
+        sub: "Making pages interactive",
+        theory: "<p>The DOM (Document Object Model) is how JS interacts with HTML. Events let you respond to user actions.<\/p><h3>Common events<\/h3><div class='op-grid'><div class='op-row'><code>onclick<\/code> mouse click<\/div><div class='op-row'><code>onkeydown<\/code> key pressed<\/div><div class='op-row'><code>oninput<\/code> text changed<\/div><div class='op-row'><code>onsubmit<\/code> form submitted<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Counter<\/title>\n<style>body{font-family:sans-serif;text-align:center;padding:40px;background:#0a0a0a;color:#eee;} button{padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:16px;margin:5px;} #num{font-size:64px;margin:20px;color:#eab308;}<\/style><\/head>\n<body>\n<div id=\"num\">0<\/div>\n<button onclick=\"add()\" style=\"background:#22c55e;color:white\">+ Add<\/button>\n<button onclick=\"subtract()\" style=\"background:#f87171;color:white\">- Subtract<\/button>\n<script>\n  var n = 0;\n  function add() { n++; document.getElementById('num').textContent = n; }\n  function subtract() { n--; document.getElementById('num').textContent = n; }\n<\/script>\n<\/body><\/html>",
+        ch: {
+          title: "🎯 Click Counter",
+          desc: "Build a counter: a large number display, a <strong>+<\/strong> button that adds 1, and a <strong>-<\/strong> button that subtracts 1.",
+          exp: "Counter with + and - buttons",
+          start: "<!DOCTYPE html>\n<html><head><title>Counter<\/title>\n<style>body{font-family:sans-serif;text-align:center;padding:40px;background:#0a0a0a;color:#eee;} button{padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:16px;margin:5px;} #num{font-size:64px;margin:20px;color:#eab308;}<\/style><\/head>\n<body>\n<div id=\"num\">0<\/div>\n<button onclick=\"add()\" style=\"background:#22c55e;color:white\">+ Add<\/button>\n<button onclick=\"subtract()\" style=\"background:#f87171;color:white\">- Subtract<\/button>\n<script>\n  var n = 0;\n  function add() { n++; document.getElementById('num').textContent = n; }\n  function subtract() { n--; document.getElementById('num').textContent = n; }\n<\/script>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('onclick') && c.includes('getElementById') && c.includes('function'),
+        },
+      },
+      {
+        id: "js6",
+        icon: "🔧",
+        title: "Functions & Timers",
+        xp: 100,
+        sub: "Reusable code and time-based actions",
+        theory: "<p>Functions in JS work like Python. Timers let you run code after a delay or on repeat.<\/p><div class='op-grid'><div class='op-row'><code>function name()<\/code> declaration<\/div><div class='op-row'><code>var f = function(){}<\/code> expression<\/div><div class='op-row'><code>setTimeout(fn, ms)<\/code> run once after delay<\/div><div class='op-row'><code>setInterval(fn, ms)<\/code> run repeatedly<\/div><div class='op-row'><code>clearInterval(id)<\/code> stop interval<\/div><\/div>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Timer<\/title>\n<style>body{font-family:sans-serif;padding:20px;background:#0a0a0a;color:#eee;text-align:center;} #timer{font-size:5em;color:#eab308;margin:20px;}<\/style><\/head>\n<body>\n<div id=\"timer\">5<\/div>\n<div id=\"msg\"><\/div>\n<script>\n  var seconds = 5;\n  var timer = setInterval(function() {\n    if (seconds > 0) {\n      document.getElementById('timer').textContent = --seconds;\n    } else {\n      document.getElementById('timer').textContent = 'GO!';\n      document.getElementById('msg').textContent = 'Time is up!';\n      clearInterval(timer);\n    }\n  }, 800);\n<\/script>\n<\/body><\/html>",
+        ch: {
+          title: "🔧 Countdown Timer",
+          desc: "Build a countdown from 10 to 0 using <code>setInterval<\/code>. When it hits 0, display <strong>\"Blast off! 🚀\"<\/strong>.",
+          exp: "Countdown from 10 to 0",
+          start: "<!DOCTYPE html>\n<html><head><title>Countdown<\/title>\n<style>body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#0a0a0a;font-family:sans-serif;} #count{font-size:6em;color:#eab308;} #msg{font-size:1.5em;color:#eee;}<\/style><\/head>\n<body>\n<div id=\"count\">10<\/div>\n<div id=\"msg\"><\/div>\n<script>\n  var n = 10;\n  var t = setInterval(function() {\n    if (n > 0) {\n      document.getElementById('count').textContent = --n;\n    } else {\n      document.getElementById('count').textContent = 'Blast off!';\n      document.getElementById('msg').textContent = '🚀';\n      clearInterval(t);\n    }\n  }, 500);\n<\/script>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('setInterval') && c.includes('clearInterval'),
+        },
+      },
+      {
+        id: "js7",
+        icon: "🏆",
+        title: "Project: Quiz App",
+        xp: 300,
+        sub: "Interactive multiple-choice quiz",
+        isProject: true,
+        theory: "<p>Build a complete interactive quiz app using DOM manipulation, event listeners, arrays, and objects.<\/p><h3>Features<\/h3><p>Multiple questions with options, score tracking, a results screen, and the ability to restart.<\/p>",
+        ex: "<!DOCTYPE html>\n<html><head><title>Quiz<\/title>\n<style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#0a0a0a;color:#eee;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}.card{background:#111;border:1px solid #222;border-radius:16px;padding:28px;max-width:480px;width:100%;}.question{font-size:1.2em;font-weight:700;margin-bottom:20px;}.opt{padding:12px 16px;border:1px solid #333;border-radius:8px;cursor:pointer;margin-bottom:8px;transition:all .15s;}.opt:hover{border-color:#eab308;}.opt.correct{background:#052e16;border-color:#22c55e;color:#86efac;}.opt.wrong{background:#2d0a0a;border-color:#f87171;}.score{font-size:3em;text-align:center;color:#eab308;margin:16px;}.btn{width:100%;padding:12px;background:#eab308;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;}<\/style><\/head>\n<body>\n<div class=\"card\" id=\"app\"><\/div>\n<script>\nvar qs = [\n  {q:'What does HTML stand for?',opts:['HyperText Markup Language','High Tech Modern Language','HyperText Making Language'],ans:0},\n  {q:'Which CSS property changes text color?',opts:['background','color','font'],ans:1},\n  {q:'What does JS stand for?',opts:['Java Syntax','JavaScript','Just Style'],ans:1},\n  {q:'Which tag creates a link?',opts:['link','href','a'],ans:2},\n  {q:'How do you select by ID in CSS?',opts:['.myId','#myId','*myId'],ans:1}\n];\nvar cur=0, sc=0;\nfunction show(){\n  if(cur>=qs.length){\n    document.getElementById('app').innerHTML='<h2 style=\"text-align:center\">Done!<\/h2><div class=\"score\">'+sc+'/'+qs.length+'<\/div><button class=\"btn\" onclick=\"cur=0;sc=0;show()\">Restart<\/button>';\n    return;\n  }\n  var q=qs[cur];\n  var html='<p style=\"color:#888;font-size:12px\">Q'+(cur+1)+'/'+qs.length+'<\/p><div class=\"question\">'+q.q+'<\/div>';\n  q.opts.forEach(function(o,i){ html+='<div class=\"opt\" onclick=\"pick('+i+')\">'+o+'<\/div>'; });\n  document.getElementById('app').innerHTML=html;\n}\nfunction pick(i){\n  var q=qs[cur];\n  var opts=document.querySelectorAll('.opt');\n  opts.forEach(function(e,j){e.onclick=null;if(j===q.ans)e.classList.add('correct');else if(j===i)e.classList.add('wrong');});\n  if(i===q.ans)sc++;\n  setTimeout(function(){cur++;show();},800);\n}\nshow();\n<\/script>\n<\/body><\/html>",
+        ch: {
+          title: "🏆 Customise Your Quiz",
+          desc: "The quiz app is loaded. Customise it: change the questions to topics YOU know, add at least 5 questions, ensure score tracking and restart work.",
+          exp: "Interactive quiz with 5+ questions",
+          start: "<!DOCTYPE html>\n<html><head><title>My Quiz<\/title>\n<style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#0a0a0a;color:#eee;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}.card{background:#111;border:1px solid #222;border-radius:16px;padding:28px;max-width:480px;width:100%;}.question{font-size:1.1em;font-weight:700;margin-bottom:20px;}.opt{padding:11px 14px;border:1px solid #333;border-radius:7px;cursor:pointer;margin-bottom:8px;transition:all .15s;}.opt:hover{border-color:#eab308;}.opt.correct{background:#052e16;border-color:#22c55e;color:#86efac;}.opt.wrong{background:#2d0a0a;border-color:#f87171;}.score{font-size:3em;text-align:center;color:#eab308;margin:16px;}.btn{width:100%;padding:12px;background:#eab308;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;}<\/style><\/head>\n<body>\n<div class=\"card\" id=\"app\"><\/div>\n<script>\nvar qs = [\n  {q:'2 + 2 = ?', opts:['3','4','5'], ans:1},\n  {q:'Capital of France?', opts:['London','Berlin','Paris'], ans:2},\n  {q:'Sky color?', opts:['Red','Blue','Green'], ans:1},\n  {q:'Days in a week?', opts:['5','6','7'], ans:2},\n  {q:'Water formula?', opts:['H2O','CO2','O2'], ans:0}\n];\nvar cur=0, sc=0;\nfunction show(){\n  if(cur>=qs.length){\n    document.getElementById('app').innerHTML='<h2 style=\"text-align:center\">Done!<\/h2><div class=\"score\">'+sc+'/'+qs.length+'<\/div><button class=\"btn\" onclick=\"cur=0;sc=0;show()\">Restart<\/button>';\n    return;\n  }\n  var q=qs[cur];\n  var html='<p style=\"color:#888;font-size:12px\">Q'+(cur+1)+'/'+qs.length+'<\/p><div class=\"question\">'+q.q+'<\/div>';\n  q.opts.forEach(function(o,i){ html+='<div class=\"opt\" onclick=\"pick('+i+')\">'+o+'<\/div>'; });\n  document.getElementById('app').innerHTML=html;\n}\nfunction pick(i){\n  var q=qs[cur];\n  var opts=document.querySelectorAll('.opt');\n  opts.forEach(function(e,j){e.onclick=null;if(j===q.ans)e.classList.add('correct');else if(j===i)e.classList.add('wrong');});\n  if(i===q.ans)sc++;\n  setTimeout(function(){cur++;show();},800);\n}\nshow();\n<\/script>\n<\/body><\/html>",
+          ok: (o,raw) => c.includes('onclick') && (c.match(/ans:/g)||[]).length >= 5,
+        },
+      },
+    ],
+  },
+  {
+    id: "sql",
+    icon: "🗄️",
+    name: "SQL",
+    sub: "The Data Vault",
+    color: "#22c55e",
+    type: "sql",
+    badge: "Beginner",
+    chapters: [
+      {
+        id: "sq1",
+        icon: "🗄️",
+        title: "What is SQL?",
+        xp: 50,
+        sub: "Querying databases like a pro",
+        theory: "<p>SQL (Structured Query Language) is the language for databases. Every app that stores data uses SQL.<\/p><h3>Tables<\/h3><p>A database contains tables. A table is like a spreadsheet with rows and columns.<\/p><div class='callout'>💡 Pre-loaded tables: <code>users<\/code>, <code>products<\/code>, and <code>orders<\/code>. Try them!<\/div>",
+        ex: "-- See all users\nSELECT * FROM users;\n\n-- See specific columns\nSELECT name, email FROM users;\n\n-- Count records\nSELECT COUNT(*) as total FROM users;",
+        ch: {
+          title: "🗄️ First Query",
+          desc: "Write a query to select all columns from the <code>users<\/code> table.",
+          exp: "All users returned",
+          start: "-- Select all users\nSELECT * FROM users;",
+          ok: (o,raw) => raw && raw.length > 0,
+        },
+      },
+      {
+        id: "sq2",
+        icon: "🔍",
+        title: "SELECT & WHERE",
+        xp: 75,
+        sub: "Filtering your data",
+        theory: "<p>The <code>WHERE<\/code> clause filters rows.<\/p><div class='op-grid'><div class='op-row'><code>=<\/code> equal &nbsp;<code>!=<\/code> not equal<\/div><div class='op-row'><code>&gt;<\/code> greater &nbsp;<code>&lt;<\/code> less<\/div><div class='op-row'><code>AND<\/code> both conditions<\/div><div class='op-row'><code>OR<\/code> either condition<\/div><div class='op-row'><code>LIKE '%text%'<\/code> pattern match<\/div><div class='op-row'><code>BETWEEN a AND b<\/code> range<\/div><\/div>",
+        ex: "-- Products under 50000\nSELECT name, price FROM products WHERE price < 50000;\n\n-- Users from Mumbai\nSELECT * FROM users WHERE city = 'Mumbai';\n\n-- Price between 1000 and 10000\nSELECT name, price FROM products\nWHERE price BETWEEN 1000 AND 10000;",
+        ch: {
+          title: "🔍 Expensive Products",
+          desc: "Select <code>name<\/code> and <code>price<\/code> from <code>products<\/code> where price is greater than 5000. Order by price descending.",
+          exp: "Products with price > 5000",
+          start: "SELECT name, price\nFROM products\nWHERE price > 5000\nORDER BY price DESC;",
+          ok: (o,raw) => raw && raw.every(function(r){ return r.price > 5000; }),
+        },
+      },
+      {
+        id: "sq3",
+        icon: "📊",
+        title: "ORDER BY & GROUP BY",
+        xp: 75,
+        sub: "Sorting and aggregating",
+        theory: "<p>Sort your results and group them for summaries.<\/p><div class='op-grid'><div class='op-row'><code>ORDER BY col ASC<\/code> A to Z<\/div><div class='op-row'><code>ORDER BY col DESC<\/code> Z to A<\/div><div class='op-row'><code>GROUP BY col<\/code> aggregate rows<\/div><div class='op-row'><code>COUNT(*)<\/code> count rows<\/div><div class='op-row'><code>SUM(col)<\/code> total<\/div><div class='op-row'><code>AVG(col)<\/code> average<\/div><\/div>",
+        ex: "-- Users per city\nSELECT city, COUNT(*) as users\nFROM users\nGROUP BY city\nORDER BY users DESC;\n\n-- Average product price by category\nSELECT category, ROUND(AVG(price),0) as avg_price\nFROM products\nGROUP BY category;",
+        ch: {
+          title: "📊 Order Stats",
+          desc: "On the <code>orders<\/code> table, group by <code>product_id<\/code> and show the total quantity sold as <code>total_sold<\/code>.",
+          exp: "Products grouped with total_sold",
+          start: "SELECT product_id, SUM(quantity) as total_sold\nFROM orders\nGROUP BY product_id\nORDER BY total_sold DESC;",
+          ok: (o,raw) => raw && raw[0] && raw[0].total_sold !== undefined,
+        },
+      },
+      {
+        id: "sq4",
+        icon: "🔗",
+        title: "JOINs",
+        xp: 100,
+        sub: "Combining multiple tables",
+        theory: "<p>JOIN combines data from multiple tables based on a related column.<\/p><div class='op-grid'><div class='op-row'><code>INNER JOIN<\/code> only matching rows<\/div><div class='op-row'><code>LEFT JOIN<\/code> all left + matching right<\/div><\/div><div class='callout'>💡 SELECT u.name, o.quantity FROM orders o INNER JOIN users u ON o.user_id = u.id<\/div>",
+        ex: "-- Orders with user and product names\nSELECT u.name, p.name as product, o.quantity\nFROM orders o\nINNER JOIN users u ON o.user_id = u.id\nINNER JOIN products p ON o.product_id = p.id;\n\n-- Users and their order count\nSELECT u.name, COUNT(o.id) as orders\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nGROUP BY u.name;",
+        ch: {
+          title: "🔗 Order Details",
+          desc: "Write a JOIN to show: user name, product name, and quantity for all orders. Join <code>orders<\/code>, <code>users<\/code>, and <code>products<\/code>.",
+          exp: "Orders with user and product names",
+          start: "SELECT u.name as user_name, p.name as product_name, o.quantity\nFROM orders o\nINNER JOIN users u ON o.user_id = u.id\nINNER JOIN products p ON o.product_id = p.id;",
+          ok: (o,raw) => raw && raw[0] && (raw[0].user_name !== undefined || raw[0].name !== undefined),
+        },
+      },
+      {
+        id: "sq5",
+        icon: "✏️",
+        title: "INSERT, UPDATE, DELETE",
+        xp: 100,
+        sub: "Modifying data",
+        theory: "<p>SQL is not just for reading — you can create, update, and delete records.<\/p><div class='callout' style='border-color:#f87171'>⚠️ Always use WHERE with UPDATE and DELETE! Without it you modify ALL rows.<\/div><p>INSERT: <code>INSERT INTO users(name, email, city) VALUES('Ali','ali@x.com','Dubai')<\/code><br>UPDATE: <code>UPDATE users SET city='Pune' WHERE id=1<\/code><br>DELETE: <code>DELETE FROM users WHERE id=1<\/code><\/p>",
+        ex: "-- Add a new user\nINSERT INTO users(name, email, city)\nVALUES('New User','new@example.com','Bangalore');\n\n-- Verify\nSELECT * FROM users WHERE name = 'New User';\n\n-- Update it\nUPDATE users SET city = 'Hyderabad' WHERE name = 'New User';\nSELECT name, city FROM users WHERE name = 'New User';",
+        ch: {
+          title: "✏️ Add Yourself",
+          desc: "Insert yourself into the <code>users<\/code> table with your name, a fake email, and your city. Then SELECT that row to confirm it was added.",
+          exp: "Your row is inserted and selected",
+          start: "INSERT INTO users(name, email, city)\nVALUES('Cheese', 'cheese@example.com', 'Mumbai');\n\nSELECT * FROM users WHERE name = 'Cheese';",
+          ok: (o,raw) => raw && raw.length > 0,
+        },
+      },
+      {
+        id: "sq6",
+        icon: "🏆",
+        title: "Project: Data Analysis",
+        xp: 300,
+        sub: "Complete DB queries",
+        isProject: true,
+        theory: "<p>Put all SQL skills together to analyse a real dataset: SELECT, WHERE, GROUP BY, JOIN, and aggregate functions.<\/p>",
+        ex: "-- 1. Top selling products\nSELECT p.name, SUM(o.quantity) as total_sold\nFROM orders o\nINNER JOIN products p ON o.product_id = p.id\nGROUP BY p.name\nORDER BY total_sold DESC;\n\n-- 2. Revenue per product\nSELECT p.name, p.price * SUM(o.quantity) as revenue\nFROM orders o\nINNER JOIN products p ON o.product_id = p.id\nGROUP BY p.name\nORDER BY revenue DESC;\n\n-- 3. Most active customers\nSELECT u.name, u.city, COUNT(o.id) as order_count\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nGROUP BY u.name\nORDER BY order_count DESC;",
+        ch: {
+          title: "🏆 Three Analysis Queries",
+          desc: "Write 3 queries: (1) count users per city, (2) find the most expensive product, (3) find the user with the most orders.",
+          exp: "3 analysis queries work",
+          start: "-- 1. Users per city:\nSELECT city, COUNT(*) as user_count\nFROM users\nGROUP BY city\nORDER BY user_count DESC;\n\n-- 2. Most expensive product:\nSELECT name, price\nFROM products\nORDER BY price DESC\nLIMIT 1;\n\n-- 3. Most orders:\nSELECT u.name, COUNT(o.id) as order_count\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nGROUP BY u.name\nORDER BY order_count DESC\nLIMIT 1;",
+          ok: (o,raw) => raw && raw.length > 0,
+        },
+      },
+    ],
+  },
+  {
+    id: "dsa",
+    icon: "⚔️",
+    name: "DS & Algorithms",
+    sub: "Algorithm Arena",
+    color: "#8b5cf6",
+    type: "python",
+    badge: "Intermediate",
+    chapters: [
+      {
+        id: "d1",
+        icon: "⏱️",
+        title: "Big O Notation",
+        xp: 75,
+        sub: "Measuring algorithm efficiency",
+        theory: "<p>Big O notation describes how an algorithm's time or space scales as input grows.<\/p><div class='op-grid'><div class='op-row'><code>O(1)<\/code> constant — always fast<\/div><div class='op-row'><code>O(log n)<\/code> logarithmic — binary search<\/div><div class='op-row'><code>O(n)<\/code> linear — one loop<\/div><div class='op-row'><code>O(n log n)<\/code> merge sort<\/div><div class='op-row'><code>O(n^2)<\/code> quadratic — nested loops<\/div><\/div><div class='callout'>💡 Always aim for the smallest Big O. O(log n) beats O(n) which beats O(n^2).<\/div>",
+        ex: "# O(n) — linear: one loop\ndef find_max(arr):\n    m = arr[0]\n    for x in arr:  # runs n times\n        if x > m: m = x\n    return m\n\n# O(1) — constant: no loop\ndef get_first(arr):\n    return arr[0]  # always one step\n\nnums = [3,7,1,9,4,2,8]\nprint(\"Max:\", find_max(nums))\nprint(\"First:\", get_first(nums))",
+        ch: {
+          title: "⏱️ O(n) Duplicate Check",
+          desc: "Write <code>has_duplicates(arr)<\/code> that checks for duplicates in <strong>O(n)<\/strong> time using a set. Test: <code>[1,2,3,4,5]<\/code> → False, <code>[1,2,3,2,5]<\/code> → True.",
+          exp: "False\nTrue",
+          start: "def has_duplicates(arr):\n    seen = set()\n    for x in arr:\n        if x in seen:\n            return True\n        seen.add(x)\n    return False\n\nprint(has_duplicates([1,2,3,4,5]))\nprint(has_duplicates([1,2,3,2,5]))",
+          ok: (o,raw) => o.includes('False') && o.includes('True'),
+        },
+      },
+      {
+        id: "d2",
+        icon: "🔍",
+        title: "Binary Search",
+        xp: 100,
+        sub: "O(log n) searching",
+        theory: "<p>Binary search finds an item in a sorted array in O(log n) — much faster than linear search O(n).<\/p><h3>How it works<\/h3><p>Start at the middle. If target is smaller, search left half. If larger, search right half. Repeat — each step halves the search space.<\/p><div class='callout'>💡 1 billion items? Binary search finds it in 30 steps. Linear takes 1 billion!<\/div>",
+        ex: "def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    steps = 0\n    while left <= right:\n        steps += 1\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid, steps\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1, steps\n\nnums = list(range(0, 100, 2))  # [0,2,4...98]\nidx, steps = binary_search(nums, 76)\nprint(f\"Found 76 at index {idx} in {steps} steps\")",
+        ch: {
+          title: "🔍 Implement Binary Search",
+          desc: "Write <code>binary_search(arr, target)<\/code> returning the index or -1. Test: <code>([1,3,5,7,9,11,13,15], 7)<\/code> → 3, <code>([1,3,5,7,9], 4)<\/code> → -1.",
+          exp: "3\n-1",
+          start: "def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\nprint(binary_search([1,3,5,7,9,11,13,15], 7))\nprint(binary_search([1,3,5,7,9], 4))",
+          ok: (o,raw) => o.trim().startsWith('3') && o.includes('-1'),
+        },
+      },
+      {
+        id: "d3",
+        icon: "🔀",
+        title: "Sorting Algorithms",
+        xp: 100,
+        sub: "Bubble, Selection & Merge Sort",
+        theory: "<p>Sorting is fundamental to CS. Different algorithms have different complexities.<\/p><div class='op-grid'><div class='op-row'><code>Bubble Sort<\/code> O(n^2) — simple<\/div><div class='op-row'><code>Selection Sort<\/code> O(n^2) — simple<\/div><div class='op-row'><code>Merge Sort<\/code> O(n log n) — fast<\/div><\/div><h3>Divide and Conquer<\/h3><p>Merge Sort splits the array in half, sorts each half, then merges them.<\/p>",
+        ex: "def bubble_sort(arr):\n    arr = arr.copy()\n    n = len(arr)\n    for i in range(n):\n        for j in range(n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\n\ndef merge_sort(arr):\n    if len(arr) <= 1: return arr\n    mid = len(arr)//2\n    L = merge_sort(arr[:mid])\n    R = merge_sort(arr[mid:])\n    res, i, j = [], 0, 0\n    while i<len(L) and j<len(R):\n        if L[i]<=R[j]: res.append(L[i]); i+=1\n        else: res.append(R[j]); j+=1\n    return res + L[i:] + R[j:]\n\nnums = [64,34,25,12,22,11,90]\nprint(\"Bubble:\", bubble_sort(nums))\nprint(\"Merge:\", merge_sort(nums))",
+        ch: {
+          title: "🔀 Selection Sort",
+          desc: "Implement <code>selection_sort(arr)<\/code>: find the minimum, swap it to the front, repeat. Test with <code>[29,10,14,37,13]<\/code>. Expected: <code>[10, 13, 14, 29, 37]<\/code>.",
+          exp: "[10, 13, 14, 29, 37]",
+          start: "def selection_sort(arr):\n    arr = arr.copy()\n    for i in range(len(arr)):\n        min_idx = i\n        for j in range(i+1, len(arr)):\n            if arr[j] < arr[min_idx]:\n                min_idx = j\n        arr[i], arr[min_idx] = arr[min_idx], arr[i]\n    return arr\n\nprint(selection_sort([29,10,14,37,13]))",
+          ok: (o,raw) => o.includes('[10, 13, 14, 29, 37]'),
+        },
+      },
+      {
+        id: "d4",
+        icon: "🔁",
+        title: "Recursion",
+        xp: 125,
+        sub: "Functions that call themselves",
+        theory: "<p>Recursion is when a function calls itself. Powerful for problems that break into smaller sub-problems.<\/p><h3>Two required parts<\/h3><p><strong>Base case:<\/strong> when to stop<br><strong>Recursive case:<\/strong> the function calling itself with smaller input<\/p><div class='callout'>💡 Fibonacci, factorial, tree traversal, merge sort — all use recursion naturally.<\/div>",
+        ex: "def factorial(n):\n    if n <= 1: return 1          # base case\n    return n * factorial(n-1)   # recursive case\n\ndef fibonacci(n):\n    if n <= 1: return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\nprint(\"5! =\", factorial(5))\nprint(\"Fib 10 =\", fibonacci(10))\nprint(\"Fibs:\", [fibonacci(i) for i in range(8)])",
+        ch: {
+          title: "🔁 Recursive Power",
+          desc: "Write a recursive <code>power(base, exp)<\/code> that calculates base^exp without using **. Test: <code>power(2,10)<\/code> → 1024, <code>power(3,4)<\/code> → 81.",
+          exp: "1024\n81",
+          start: "def power(base, exp):\n    if exp == 0: return 1          # base case\n    return base * power(base, exp - 1)  # recursive\n\nprint(power(2, 10))\nprint(power(3, 4))",
+          ok: (o,raw) => o.includes('1024') && o.includes('81'),
+        },
+      },
+      {
+        id: "d5",
+        icon: "🏆",
+        title: "Project: Mini Search Engine",
+        xp: 400,
+        sub: "Full DS&A capstone",
+        isProject: true,
+        theory: "<p>Build a mini search engine using an inverted index — the same concept behind Google. This uses hash maps (dicts), sorting, and efficient lookup.<\/p>",
+        ex: "documents = {\n    1: \"Python is great for data science and machine learning\",\n    2: \"JavaScript runs in browsers and builds web apps\",\n    3: \"Python and JavaScript are the most popular languages\",\n    4: \"Data science uses Python pandas numpy scikit-learn\",\n    5: \"React is a JavaScript library for user interfaces\"\n}\n\ndef build_index(docs):\n    index = {}\n    for doc_id, text in docs.items():\n        for word in text.lower().split():\n            word = word.strip('.,!?')\n            if word not in index:\n                index[word] = set()\n            index[word].add(doc_id)\n    return index\n\ndef search(query, index, docs):\n    words = query.lower().split()\n    scores = {}\n    for word in words:\n        for doc_id in index.get(word, set()):\n            scores[doc_id] = scores.get(doc_id, 0) + 1\n    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)\n    return ranked\n\nindex = build_index(documents)\nresults = search(\"Python data\", index, documents)\nprint(\"Search: Python data\")\nfor doc_id, score in results:\n    print(f\"  [score:{score}] {documents[doc_id][:50]}...\")",
+        ch: {
+          title: "🏆 Extend the Search Engine",
+          desc: "Run the search engine. Add 2 more documents and search for \"machine learning\". Print <strong>\"Top result:\"<\/strong> followed by the full text of the best match.",
+          exp: "Top result:",
+          start: "documents = {\n    1: \"Python is great for data science and machine learning\",\n    2: \"JavaScript runs in browsers and builds web apps\",\n    3: \"Python and JavaScript are the most popular languages\",\n    4: \"Data science uses Python pandas numpy scikit-learn\",\n    5: \"React is a JavaScript library for user interfaces\",\n    6: \"Machine learning models learn patterns from training data\",\n    7: \"Deep learning is a subset of machine learning with neural networks\"\n}\n\ndef build_index(docs):\n    index = {}\n    for doc_id, text in docs.items():\n        for word in text.lower().split():\n            word = word.strip('.,!?')\n            if word not in index: index[word] = set()\n            index[word].add(doc_id)\n    return index\n\ndef search(query, index, docs):\n    words = query.lower().split()\n    scores = {}\n    for word in words:\n        for doc_id in index.get(word, set()):\n            scores[doc_id] = scores.get(doc_id, 0) + 1\n    return sorted(scores.items(), key=lambda x: x[1], reverse=True)\n\nindex = build_index(documents)\nresults = search(\"machine learning\", index, documents)\nif results:\n    top_id = results[0][0]\n    print(f\"Top result: {documents[top_id]}\")",
+          ok: (o,raw) => o.includes('Top result:'),
+        },
+      },
+    ],
+  },
+  {
+    id: "ai",
+    icon: "🤖",
+    name: "AI & ML",
+    sub: "Intelligence Frontier",
+    color: "#ec4899",
+    type: "python",
+    badge: "Advanced",
+    chapters: [
+      {
+        id: "ai1",
+        icon: "🤖",
+        title: "What is AI & ML?",
+        xp: 75,
+        sub: "How machines learn from data",
+        theory: "<p>Artificial Intelligence makes computers do things that normally require human intelligence. Machine Learning is a subset where computers learn from data without being explicitly programmed.<\/p><h3>Types of ML<\/h3><div class='op-grid'><div class='op-row'><code>Supervised<\/code> learn from labelled examples<\/div><div class='op-row'><code>Unsupervised<\/code> find hidden patterns<\/div><div class='op-row'><code>Reinforcement<\/code> learn by reward/punishment<\/div><\/div><div class='callout'>💡 ML workflow: Collect data → Clean → Train model → Evaluate → Predict<\/div>",
+        ex: "# Nearest Neighbour — simplest ML model\ndata = [\n    [150, 50, 'Small'],\n    [160, 60, 'Medium'],\n    [170, 70, 'Medium'],\n    [180, 85, 'Large'],\n    [190, 95, 'Large'],\n]\n\ndef predict(height, weight, training):\n    best, best_dist = None, float('inf')\n    for h, w, label in training:\n        dist = ((height-h)**2 + (weight-w)**2)**0.5\n        if dist < best_dist:\n            best_dist, best = dist, label\n    return best\n\nprint(predict(155, 55, data))\nprint(predict(185, 90, data))\nprint(predict(175, 75, data))",
+        ch: {
+          title: "🤖 KNN Classifier",
+          desc: "Run the classifier. Then add 3 more training examples and predict size for height=165, weight=65. Print <strong>\"Prediction: [result]\"<\/strong>.",
+          exp: "Prediction: Medium",
+          start: "data = [\n    [150,50,'Small'],[160,60,'Medium'],[170,70,'Medium'],\n    [180,85,'Large'],[190,95,'Large'],\n    [155,55,'Small'],[175,75,'Medium'],[185,88,'Large']\n]\n\ndef predict(height, weight, training):\n    best, best_dist = None, float('inf')\n    for h, w, label in training:\n        dist = ((height-h)**2 + (weight-w)**2)**0.5\n        if dist < best_dist:\n            best_dist, best = dist, label\n    return best\n\nresult = predict(165, 65, data)\nprint(f\"Prediction: {result}\")",
+          ok: (o,raw) => o.includes('Prediction:'),
+        },
+      },
+      {
+        id: "ai2",
+        icon: "📈",
+        title: "Linear Regression",
+        xp: 100,
+        sub: "Predicting continuous values",
+        theory: "<p>Linear regression finds the best-fit line through data points to predict values.<\/p><h3>The formula: y = mx + b<\/h3><p>m = slope, b = intercept. We find them by minimising Mean Squared Error (MSE).<\/p><div class='callout'>💡 This is the foundation of ALL machine learning — minimise the error!<\/div>",
+        ex: "def predict(x, m, b): return m * x + b\n\ndef gradient_descent(x, y, lr=0.01, epochs=1000):\n    m, b = 0, 0\n    n = len(x)\n    for _ in range(epochs):\n        y_pred = [predict(xi, m, b) for xi in x]\n        dm = -2/n * sum(xi*(yi-ypi) for xi,yi,ypi in zip(x,y,y_pred))\n        db = -2/n * sum(yi-ypi for yi,ypi in zip(y,y_pred))\n        m -= lr * dm\n        b -= lr * db\n    return m, b\n\nsize  = [50, 60, 70, 80, 90, 100, 110, 120]\nprice = [25, 30, 36, 40, 47,  52,  57,  62]\n\nm, b = gradient_descent(size, price)\nprint(f\"Price for 95m2: {predict(95,m,b):.1f} lakhs\")",
+        ch: {
+          title: "📈 Predict House Price",
+          desc: "Run the model. Then predict the price for 150m2 and print: <strong>\"A 150m2 house costs X lakhs\"<\/strong>.",
+          exp: "A 150m2 house costs",
+          start: "def predict(x, m, b): return m * x + b\n\ndef gradient_descent(x, y, lr=0.01, epochs=1000):\n    m, b = 0, 0\n    n = len(x)\n    for _ in range(epochs):\n        yp = [predict(xi,m,b) for xi in x]\n        dm = -2/n * sum(xi*(yi-ypi) for xi,yi,ypi in zip(x,y,yp))\n        db = -2/n * sum(yi-ypi for yi,ypi in zip(y,yp))\n        m -= lr*dm; b -= lr*db\n    return m, b\n\nsize  = [50,60,70,80,90,100,110,120]\nprice = [25,30,36,40,47,52,57,62]\nm, b = gradient_descent(size, price)\n\npred = predict(150, m, b)\nprint(f\"A 150m2 house costs {pred:.1f} lakhs\")",
+          ok: (o,raw) => o.includes('A 150m2 house costs'),
+        },
+      },
+      {
+        id: "ai3",
+        icon: "🧠",
+        title: "Neural Networks",
+        xp: 150,
+        sub: "The brain of AI",
+        theory: "<p>A neural network is inspired by the human brain — layers of connected nodes (neurons) that transform inputs into outputs.<\/p><div class='op-grid'><div class='op-row'><code>Input layer<\/code> raw features<\/div><div class='op-row'><code>Hidden layers<\/code> learn patterns<\/div><div class='op-row'><code>Output layer<\/code> prediction<\/div><div class='op-row'><code>Weights<\/code> connection strengths<\/div><div class='op-row'><code>Sigmoid<\/code> activation function<\/div><div class='op-row'><code>Backprop<\/code> update weights<\/div><\/div>",
+        ex: "import math\nfrom random import uniform, seed\nseed(42)\n\ndef sigmoid(x): return 1/(1+math.exp(-max(-500,min(500,x))))\n\nclass Neuron:\n    def __init__(self, n):\n        self.w=[uniform(-1,1) for _ in range(n)]; self.b=uniform(-1,1)\n    def forward(self,x):\n        self.inputs=x; self.z=sum(wi*xi for wi,xi in zip(self.w,x))+self.b\n        self.out=sigmoid(self.z); return self.out\n\ndata=[(0,0,0),(0,1,1),(1,0,1),(1,1,0)]\nn1=Neuron(2);n2=Neuron(2);n3=Neuron(2)\nfor _ in range(10000):\n    for x1,x2,y in data:\n        h1=n1.forward([x1,x2]);h2=n2.forward([x1,x2]);out=n3.forward([h1,h2])\n        e=y-out\n        n3.w[0]+=0.5*e*h1;n3.w[1]+=0.5*e*h2;n3.b+=0.5*e\n\nfor x1,x2,y in data:\n    h1=n1.forward([x1,x2]);h2=n2.forward([x1,x2])\n    pred=round(n3.forward([h1,h2]))\n    print(f\"{x1} XOR {x2} = {pred} {'OK' if pred==y else 'WRONG'}\")",
+        ch: {
+          title: "🧠 XOR Accuracy",
+          desc: "Run the XOR neural network. Count how many of the 4 predictions are correct and print <strong>\"Accuracy: X/4\"<\/strong>.",
+          exp: "Accuracy: ",
+          start: "import math\nfrom random import uniform, seed\nseed(42)\n\ndef sigmoid(x): return 1/(1+math.exp(-max(-500,min(500,x))))\n\nclass Neuron:\n    def __init__(self, n): self.w=[uniform(-1,1) for _ in range(n)]; self.b=uniform(-1,1)\n    def forward(self,x):\n        self.z=sum(wi*xi for wi,xi in zip(self.w,x))+self.b; self.out=sigmoid(self.z); return self.out\n\ndata=[(0,0,0),(0,1,1),(1,0,1),(1,1,0)]\nn1=Neuron(2);n2=Neuron(2);n3=Neuron(2)\nfor _ in range(10000):\n    for x1,x2,y in data:\n        h1=n1.forward([x1,x2]);h2=n2.forward([x1,x2]);out=n3.forward([h1,h2])\n        e=y-out; n3.w[0]+=0.5*e*h1;n3.w[1]+=0.5*e*h2;n3.b+=0.5*e\n\ncorrect=0\nfor x1,x2,y in data:\n    h1=n1.forward([x1,x2]);h2=n2.forward([x1,x2])\n    if round(n3.forward([h1,h2]))==y: correct+=1\nprint(f\"Accuracy: {correct}/4\")",
+          ok: (o,raw) => o.includes('Accuracy:'),
+        },
+      },
+      {
+        id: "ai4",
+        icon: "🏆",
+        title: "Project: Sentiment Analyser",
+        xp: 400,
+        sub: "Build your own AI classifier",
+        isProject: true,
+        theory: "<p>Build a complete sentiment analysis system from scratch — the same technology used by Twitter and Amazon to understand how people feel about products.<\/p><h3>Approach<\/h3><p>Count positive and negative words in a text. Calculate a sentiment score. Classify as Positive, Negative, or Neutral. This is the Naive Bayes word-counting approach.<\/p>",
+        ex: "POS = {'great','amazing','love','excellent','good','awesome','fantastic','wonderful','best','happy','brilliant','perfect'}\nNEG = {'bad','terrible','awful','hate','poor','worst','horrible','disappointing','dreadful','useless','boring','waste'}\n\ndef analyse(text):\n    words = text.lower().split()\n    pos = sum(1 for w in words if w.strip('.,!?') in POS)\n    neg = sum(1 for w in words if w.strip('.,!?') in NEG)\n    score = pos - neg\n    if score > 0: s = 'Positive'\n    elif score < 0: s = 'Negative'\n    else: s = 'Neutral'\n    return s, score\n\nreviews = [\n    \"This product is amazing and fantastic! I love it.\",\n    \"Terrible quality. Broke after one day. Waste of money.\",\n    \"It arrived on time and the packaging was okay.\",\n]\nfor r in reviews:\n    s, sc = analyse(r)\n    print(f\"{s:10} (score:{sc:+d}) — {r[:50]}...\")",
+        ch: {
+          title: "🏆 Extend the Analyser",
+          desc: "Run the sentiment analyser. Add 5 more positive words and 5 more negative words. Test 2 of your own reviews. Print <strong>\"Extended results:\"<\/strong> before them.",
+          exp: "Extended results:",
+          start: "POS = {'great','amazing','love','excellent','good','awesome','fantastic','wonderful','best','happy',\n       'superb','outstanding','magnificent','delightful','splendid'}\nNEG = {'bad','terrible','awful','hate','poor','worst','horrible','disappointing','dreadful','useless',\n       'dull','inferior','mediocre','pathetic','ridiculous'}\n\ndef analyse(text):\n    words = text.lower().split()\n    pos = sum(1 for w in words if w.strip('.,!?') in POS)\n    neg = sum(1 for w in words if w.strip('.,!?') in NEG)\n    score = pos - neg\n    s = 'Positive' if score>0 else 'Negative' if score<0 else 'Neutral'\n    return s, score\n\nmy_reviews = [\n    \"This is absolutely magnificent and splendid! Outstanding quality!\",\n    \"Ridiculous and mediocre. Pathetic product, totally inferior garbage.\"\n]\nprint(\"Extended results:\")\nfor r in my_reviews:\n    s, sc = analyse(r)\n    print(f\"  {s} (score:{sc:+d}) — {r}\")",
+          ok: (o,raw) => o.includes('Extended results:'),
+        },
+      },
+    ],
+  },
+  {
+    id: "git",
+    icon: "🔧",
+    name: "Git & GitHub",
+    sub: "Version Control",
+    color: "#f43f5e",
+    type: "concept",
+    badge: "Tool",
+    chapters: [
+      {
+        id: "g1",
+        icon: "📁",
+        title: "What is Git?",
+        xp: 50,
+        sub: "A time machine for your code",
+        theory: "<p>Git is a version control system — it tracks every change you make to your code so you can go back in time, collaborate, and never lose work.<\/p><div class='op-grid'><div class='op-row'><code>Repository<\/code> your project folder<\/div><div class='op-row'><code>Commit<\/code> a saved snapshot<\/div><div class='op-row'><code>Branch<\/code> parallel version<\/div><div class='op-row'><code>Merge<\/code> combine branches<\/div><div class='op-row'><code>Remote<\/code> copy on GitHub<\/div><div class='op-row'><code>Push/Pull<\/code> sync with remote<\/div><\/div><div class='callout'>💡 Try the simulated terminal below — type real git commands!<\/div>",
+        ex: "git init\ngit status\ngit add .\ngit commit -m \"First commit\"\ngit log",
+        ch: {
+          title: "📁 Your First Commit",
+          desc: "In the terminal, run: <code>git init<\/code>, then <code>git status<\/code>, then <code>git add .<\/code>, then <code>git commit -m \"First commit\"<\/code>.",
+          exp: "Ran all 4 commands",
+          start: "git init",
+          ok: (o,raw) => true,
+        },
+      },
+      {
+        id: "g2",
+        icon: "🌿",
+        title: "Branches",
+        xp: 75,
+        sub: "Working in parallel",
+        theory: "<p>Branches let you work on new features without touching the main codebase.<\/p><div class='op-grid'><div class='op-row'><code>git branch<\/code> list branches<\/div><div class='op-row'><code>git branch name<\/code> create branch<\/div><div class='op-row'><code>git checkout name<\/code> switch to branch<\/div><div class='op-row'><code>git checkout -b name<\/code> create and switch<\/div><div class='op-row'><code>git merge name<\/code> merge into current<\/div><div class='op-row'><code>git branch -d name<\/code> delete branch<\/div><\/div>",
+        ex: "git checkout -b feature/login\ngit add .\ngit commit -m \"Add login form\"\ngit checkout main\ngit merge feature/login\ngit branch -d feature/login",
+        ch: {
+          title: "🌿 Feature Branch",
+          desc: "Run <code>git checkout -b feature/navbar<\/code> to create and switch to a new branch. Then run <code>git branch<\/code> to confirm.",
+          exp: "Created feature/navbar branch",
+          start: "git checkout -b feature/navbar",
+          ok: (o,raw) => true,
+        },
+      },
+      {
+        id: "g3",
+        icon: "☁️",
+        title: "GitHub & Remote",
+        xp: 75,
+        sub: "Sharing code with the world",
+        theory: "<p>GitHub is the world's largest code hosting platform. Push your local Git repos to GitHub to back up, share, and collaborate.<\/p><div class='op-grid'><div class='op-row'><code>git remote add origin URL<\/code><\/div><div class='op-row'><code>git push -u origin main<\/code><\/div><div class='op-row'><code>git pull<\/code> get latest<\/div><div class='op-row'><code>git clone URL<\/code> download repo<\/div><\/div><h3>GitHub workflow<\/h3><p>Fork → Clone → Branch → Code → Push → Pull Request → Merge<\/p>",
+        ex: "git remote add origin https://github.com/username/project.git\ngit push -u origin main\n\n# Clone someone else's repo:\ngit clone https://github.com/codedex-io/python-101.git",
+        ch: {
+          title: "☁️ Add a Remote",
+          desc: "Run <code>git remote add origin https://github.com/you/project.git<\/code> then <code>git remote -v<\/code> to confirm.",
+          exp: "Added remote origin",
+          start: "git remote add origin https://github.com/you/project.git",
+          ok: (o,raw) => true,
+        },
+      },
+      {
+        id: "g4",
+        icon: "🏆",
+        title: "Project: Full Git Workflow",
+        xp: 250,
+        sub: "Complete open source flow",
+        isProject: true,
+        theory: "<p>The complete open-source contribution workflow — how the real world works.<\/p><h3>Full flow<\/h3><p>1. Fork a project on GitHub. 2. Clone your fork. 3. Create a feature branch. 4. Make changes. 5. Commit and push. 6. Open a Pull Request. 7. Wait for review and merge!<\/p>",
+        ex: "# Complete workflow simulation:\ngit init\ngit checkout -b fix/typo-in-readme\n# (make your changes)\ngit add README.md\ngit commit -m \"Fix typo in README\"\ngit push origin fix/typo-in-readme\n# Now open a Pull Request on GitHub!",
+        ch: {
+          title: "🏆 Full Workflow",
+          desc: "Run the complete flow in the terminal: <code>git init<\/code>, <code>git checkout -b my-feature<\/code>, <code>git add .<\/code>, <code>git commit -m \"My feature\"<\/code>, then <code>git log<\/code>.",
+          exp: "Full workflow",
+          start: "git init",
+          ok: (o,raw) => true,
+        },
+      },
+    ],
+  },
+];
+
+
+// ═══════════════ STATE + PERSISTENCE ════════════════════════
+const LS = 'cq_v2';
+function loadSave(){try{return JSON.parse(localStorage.getItem(LS))||{};}catch{return {};}}
+function writeSave(){try{localStorage.setItem(LS,JSON.stringify({done:[...done],xp:totalXP,n:totalDone,streak,lastDate,lb:leaderboard,name:playerName}));}catch{}}
+
+const sv = loadSave();
+const done = new Set(sv.done||[]);
+let totalXP = sv.xp||0, totalDone = sv.n||0, streak = sv.streak||0, lastDate = sv.lastDate||'';
+let leaderboard = sv.lb||[{name:'Alice',xp:1200},{name:'Bob',xp:800},{name:'Carol',xp:640}];
+let playerName = sv.name||'';
+let curTrack=null, curChIdx=0, mobCurTab='lesson', curMode='python';
+let prevScreen='home';
+let sqlDB=null, pyReady=false;
+
+function updateStreak(){
+  const today=new Date().toDateString(),yest=new Date(Date.now()-86400000).toDateString();
+  if(lastDate===today)return;
+  streak = lastDate===yest ? streak+1 : 1;
+  lastDate=today; writeSave();
+}
+
+const SQL_SEED=`CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY,name TEXT,email TEXT,city TEXT);CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY,name TEXT,price REAL,category TEXT);CREATE TABLE IF NOT EXISTS orders(id INTEGER PRIMARY KEY,user_id INTEGER,product_id INTEGER,quantity INTEGER,date TEXT);INSERT OR IGNORE INTO users VALUES(1,'Alice','a@e.com','Mumbai'),(2,'Bob','b@e.com','Delhi'),(3,'Carol','c@e.com','Mumbai'),(4,'Dave','d@e.com','Bangalore'),(5,'Eve','e@e.com','Pune'),(6,'Frank','f@e.com','Delhi');INSERT OR IGNORE INTO products VALUES(1,'Laptop',75000,'Electronics'),(2,'Phone',25000,'Electronics'),(3,'Headphones',3500,'Electronics'),(4,'Coffee Mug',350,'Kitchen'),(5,'Python Book',1200,'Books'),(6,'Chair',8500,'Furniture'),(7,'Desk',12000,'Furniture'),(8,'Notebook',150,'Stationery');INSERT OR IGNORE INTO orders VALUES(1,1,1,1,'2025-01-10'),(2,1,3,2,'2025-01-12'),(3,2,2,1,'2025-01-15'),(4,3,5,3,'2025-01-16'),(5,4,6,1,'2025-01-20'),(6,5,4,5,'2025-01-22'),(7,2,1,1,'2025-02-01'),(8,6,8,10,'2025-02-05'),(9,3,2,2,'2025-02-10'),(10,1,7,1,'2025-02-15');`;
+
+// ═══════════════ LOADING ═════════════════════════════════════
+let fp=0;
+const fb=setInterval(()=>{fp=Math.min(fp+2,78);document.getElementById('ld-bar').style.width=fp+'%';},100);
+function ldMsg(m){document.getElementById('ld-msg').textContent=m;}
+
+async function initAll(){
+  ldMsg('Loading Python…');
+  Sk.configure({output:()=>{},read:x=>{
+    if(Sk.builtinFiles&&Sk.builtinFiles.files[x]!==undefined)return Sk.builtinFiles.files[x];
+    throw "File not found: '"+x+"'";
+  }});
+  pyReady=true;
+  ldMsg('Loading SQL…');
+  await initSqlJs({locateFile:f=>`https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/${f}`})
+    .then(S=>{sqlDB=new S.Database();sqlDB.run(SQL_SEED);})
+    .catch(()=>{});
+  updateStreak();
+  clearInterval(fb);
+  document.getElementById('ld-bar').style.width='100%';
+  ldMsg('Ready!');
+  await new Promise(r=>setTimeout(r,250));
+  const ov=document.getElementById('loading');
+  ov.classList.add('out');
+  setTimeout(()=>ov.style.display='none',550);
+  initApp();
+}
+document.addEventListener('DOMContentLoaded',initAll);
+
+// ═══════════════ PYTHON (Skulpt) ═════════════════════════════
+async function execPy(code){
+  if(!pyReady)return{out:'',err:'Python not ready.'};
+  return new Promise(res=>{
+    let out='';
+    Sk.configure({
+      output:t=>{out+=t;},
+      read:x=>{if(Sk.builtinFiles&&Sk.builtinFiles.files[x]!==undefined)return Sk.builtinFiles.files[x];throw"File not found: '"+x+"'";},
+      inputfun:()=>Promise.resolve(''),
+      __future__:Sk.python3
+    });
+    Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,code,true))
+      .then(()=>res({out,err:null}))
+      .catch(e=>{
+        const msg=e.toString().replace(/^.*?Error:\s*/,'').replace(/\s+on line \d+/,'').trim();
+        res({out,err:msg||String(e)});
+      });
+  });
+}
+
+// ═══════════════ SQL ═════════════════════════════════════════
+function sqlQuery(sql){
+  if(!sqlDB)return[];
+  let last=[];
+  for(const s of sql.split(';').map(x=>x.trim()).filter(Boolean)){
+    const r=sqlDB.exec(s);
+    if(r.length>0){const{columns:c,values:v}=r[0];last=v.map(row=>{const o={};c.forEach((k,i)=>o[k]=row[i]);return o;});}
+    else last=[];
+  }
+  return last;
+}
+async function runSQL(){
+  const code=G('sql-ed').value;
+  sBtn('btn-run',true,'⏳');
+  try{
+    const rows=sqlQuery(code);
+    const so=G('sql-out'),ss=G('sql-st');
+    if(!rows.length){so.innerHTML='<span class="ook">✓ OK (no rows)</span>';ss.textContent='OK';ss.style.color='var(--ok)';}
+    else{
+      const cols=Object.keys(rows[0]);
+      let h=`<table class="sql-tbl"><thead><tr>${cols.map(c=>`<th>${e(c)}</th>`).join('')}</tr></thead><tbody>`;
+      rows.forEach(r=>{h+=`<tr>${cols.map(c=>`<td>${e(String(r[c]??''))}</td>`).join('')}</tr>`;});
+      h+=`</tbody></table><div style="font-size:10px;color:var(--t3);margin-top:5px">${rows.length} row${rows.length!==1?'s':''}</div>`;
+      so.innerHTML=h; ss.textContent=rows.length+' rows'; ss.style.color='var(--ok)';
+    }
+  }catch(ex){
+    G('sql-out').innerHTML=`<span class="oerr">❌ ${e(ex.message||String(ex))}</span>`;
+    G('sql-st').textContent='Error'; G('sql-st').style.color='var(--err)';
+  }
+  sBtn('btn-run',false,'▶ Run Query');
+}
+
+// ═══════════════ SYNTAX HIGHLIGHTING ════════════════════════
+function hlPy(raw){
+  let h=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/(#[^\\n]*)/g,'<span class="hl-cm">$1</span>');
+  h=h.replace(/('[^']*'|"[^"]*")/g,'<span class="hl-st">$1</span>');
+  h=h.replace(/(#[^\n]*)/g,'<span class="hl-cm">$1</span>');
+  h=h.replace(/\b(def|class|if|elif|else|for|while|return|import|from|in|not|and|or|is|True|False|None|pass|break|continue|try|except|finally|with|as|lambda|yield|global|nonlocal|del|raise|assert|self|super)\b/g,'<span class="hl-kw">$1</span>');
+  h=h.replace(/\b(print|len|range|type|str|int|float|list|dict|set|tuple|bool|input|open|enumerate|zip|map|filter|sorted|sum|min|max|abs|round|hex|bin|chr|ord|repr|vars|dir|hasattr|getattr|setattr|isinstance|issubclass|staticmethod|classmethod|property)\b/g,'<span class="hl-bi">$1</span>');
+  h=h.replace(/\b(\d+\.?\d*|\.\d+)\b/g,'<span class="hl-nm">$1</span>');
+  return h;
+}
+function hlHTML(raw){
+  let h=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/(&lt;!--[\s\S]*?--&gt;)/g,'<span class="hl-cm">$1</span>');
+  h=h.replace(/(&lt;\/?[\w.:-]+)((?:\s+[\w:-]+=(?:"[^"]*"|'[^']*'|[^\s>]*))*)\s*\/?&gt;/g,
+    (m,tag,attrs)=>`<span class="hl-tag">${tag}</span>${attrs.replace(/([\w:-]+)=("[^"]*"|'[^']*')/g,'<span class="hl-attr">$1</span>=<span class="hl-val">$2</span>')}&gt;`);
+  h=h.replace(/(&amp;[\w#]+;)/g,'<span class="hl-ent">$1</span>');
+  return h;
+}
+function hlSQL(raw){
+  let h=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/('(?:[^'\\]|\\.)*')/g,'<span class="hl-sql-str">$1</span>');
+  h=h.replace(/(--[^\n]*)/g,'<span class="hl-cm">$1</span>');
+  h=h.replace(/\b(SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|CREATE|TABLE|DROP|ALTER|ADD|COLUMN|INDEX|JOIN|LEFT|RIGHT|INNER|OUTER|ON|GROUP|BY|ORDER|HAVING|LIMIT|OFFSET|DISTINCT|AS|AND|OR|NOT|IN|LIKE|BETWEEN|IS|NULL|PRIMARY|KEY|IF|EXISTS|FOREIGN|REFERENCES|CASCADE|DEFAULT|CONSTRAINT|UNIQUE|CHECK)\b/gi,
+    '<span class="hl-sql-kw">$&</span>');
+  h=h.replace(/\b(COUNT|SUM|AVG|MIN|MAX|ROUND|COALESCE|IFNULL|LENGTH|UPPER|LOWER|SUBSTR|TRIM|DATE|NOW|STRFTIME)\b/gi,
+    '<span class="hl-sql-fn">$&</span>');
+  h=h.replace(/\b(\d+\.?\d*)\b/g,'<span class="hl-sql-nm">$1</span>');
+  return h;
+}
+function applyHL(ta, hlEl, lnEl, hlFn){
+  const v=ta.value;
+  hlEl.innerHTML=hlFn(v)+'\n'; // trailing \n keeps heights in sync
+  // sync scroll
+  hlEl.scrollTop=ta.scrollTop; hlEl.scrollLeft=ta.scrollLeft;
+  // line numbers
+  const lines=v.split('\n').length;
+  lnEl.textContent=Array.from({length:lines},(_,i)=>i+1).join('\n');
+}
+function syncPyHL(){applyHL(G('code-ed'),G('hl-py'),G('ln-py'),hlPy);}
+function syncWebHL(){applyHL(G('web-ed'),G('hl-web'),G('web-lns'),hlHTML);}
+function syncSqlHL(){applyHL(G('sql-ed'),G('hl-sql'),G('sql-lns'),hlSQL);}
+
+// ═══════════════ APP INIT ════════════════════════════════════
+function initApp(){
+  renderHome();
+  initEditors();
+  initGit();
+  updateChips();
+  // Ask for name if new user
+  if(!playerName&&totalDone===0){
+    setTimeout(()=>{
+      const n=prompt('Welcome to CodeQuest! What\'s your name?');
+      if(n&&n.trim()){playerName=n.trim();writeSave();}
+    },600);
+  }
+}
+
+// ═══════════════ SCREENS ════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  G(id).classList.add('active');
+}
+function goHome(){
+  prevScreen='home';
+  showScreen('home');
+  G('back-btn').style.display='none';
+  G('bc').textContent='Choose your adventure ⬇️';
+  renderHome();
+}
+function goBack(){
+  if(prevScreen==='track'&&curTrack){
+    openTrack(curTrack.id);
+  } else {
+    goHome();
+  }
+}
+
+// ═══════════════ HOME ════════════════════════════════════════
+function renderHome(){
+  const MAX=TRACKS.reduce((s,t)=>s+t.chapters.reduce((a,c)=>a+c.xp,0),0);
+  const totalCh=TRACKS.reduce((s,t)=>s+t.chapters.length,0);
+  G('stats-row').innerHTML=`
+    <div class="stat-card"><div class="stat-n" style="color:var(--py)">${TRACKS.length}</div><div class="stat-l">Tracks</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--ok)">${totalDone}/${totalCh}</div><div class="stat-l">Done</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--js)">${totalXP}</div><div class="stat-l">XP</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--git)">${streak}</div><div class="stat-l">Streak 🔥</div></div>
+  `;
+  // Continue banner
+  const cw=G('cont-wrap');
+  if(curTrack&&curChIdx>=0){
+    const ch=curTrack.chapters[curChIdx];
+    cw.innerHTML=`<div class="cont-card" onclick="openTrack('${curTrack.id}');setTimeout(()=>openChapter(${curChIdx}),80)">
+      <div><div class="cont-label">Continue learning</div><div class="cont-title">${curTrack.icon} ${curTrack.name} › ${ch.icon} ${ch.title}</div></div>
+      <div class="cont-arrow">→</div>
+    </div>`;
+  } else cw.innerHTML='';
+
+  // Leaderboard
+  renderLB();
+
+  // Tracks grid
+  G('tg').innerHTML=TRACKS.map(t=>{
+    const td=t.chapters.filter(c=>done.has(c.id)).length;
+    const pct=Math.round(td/t.chapters.length*100);
+    return `<div class="tc" onclick="openTrack('${t.id}')" style="--c:${t.color}">
+      <span class="tc-ico">${t.icon}</span>
+      <div class="tc-name">${t.name}</div>
+      <div class="tc-sub">${t.sub}</div>
+      <div class="tc-pbar"><div class="tc-pfill" style="width:${pct}%"></div></div>
+      <div class="tc-meta"><span>${td}/${t.chapters.length}</span><span class="tc-badge">${t.badge}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function renderLB(){
+  // Add current player to LB if they have XP
+  if(playerName&&totalXP>0){
+    const idx=leaderboard.findIndex(x=>x.name===playerName);
+    if(idx>=0)leaderboard[idx].xp=totalXP;
+    else leaderboard.push({name:playerName,xp:totalXP});
+  }
+  const sorted=[...leaderboard].sort((a,b)=>b.xp-a.xp).slice(0,5);
+  const maxXP=sorted[0]?.xp||1;
+  const ranks=['🥇','🥈','🥉','4','5'];
+  const rankCls=['g1','g2','g3','',''];
+  G('lb-wrap').innerHTML=`<div class="lb-card">
+    <div class="lb-title">🏆 Leaderboard</div>
+    ${sorted.map((p,i)=>`<div class="lb-row">
+      <div class="lb-rank ${rankCls[i]}">${ranks[i]}</div>
+      <div class="lb-name" style="${p.name===playerName?'color:var(--py)':''}">${e(p.name)}${p.name===playerName?' (you)':''}</div>
+      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.round(p.xp/maxXP*100)}%"></div></div>
+      <div class="lb-xp">${p.xp} XP</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ═══════════════ TRACK SCREEN ════════════════════════════════
+function openTrack(id){
+  prevScreen='track';
+  curTrack=TRACKS.find(t=>t.id===id);
+  const t=curTrack;
+  G('ti').textContent=t.icon; G('tn').textContent=t.name; G('ts').textContent=t.sub;
+  const td=t.chapters.filter(c=>done.has(c.id)).length;
+  const txp=t.chapters.filter(c=>done.has(c.id)).reduce((s,c)=>s+c.xp,0);
+  const mx=t.chapters.reduce((s,c)=>s+c.xp,0);
+  G('tb').style.cssText=`width:${td/t.chapters.length*100}%;background:${t.color}`;
+  G('trk-stats').innerHTML=`Completed <b>${td}</b> of <b>${t.chapters.length}</b> chapters · <b>${txp}/${mx} XP</b>`;
+  G('trk-hero').style.setProperty('--c',t.color);
+  G('chl').innerHTML=t.chapters.map((ch,i)=>`
+    <div class="ch-item ${ch.isProject?'ch-proj':''} ${done.has(ch.id)?'done':''}" onclick="openChapter(${i})" style="--c:${t.color}">
+      <div class="ch-num">${ch.isProject?'🏆':i+1}</div>
+      <div class="ch-info">
+        <div class="ch-title">${ch.icon} ${ch.title}</div>
+        <div class="ch-sub">${ch.sub}</div>
+      </div>
+      <div class="ch-right">
+        <span class="ch-xp">+${ch.xp} XP</span>
+        <span class="ch-star">⭐</span>
+      </div>
+    </div>`).join('');
+  showScreen('trkscreen');
+  G('back-btn').style.display='flex';
+  G('bc').innerHTML=`${t.icon} <b>${t.name}</b>`;
+}
+
+// ═══════════════ CHAPTER / LESSON ════════════════════════════
+function openChapter(idx){
+  prevScreen='lesson';
+  curChIdx=idx;
+  const ch=curTrack.chapters[idx];
+  curMode=curTrack.type;
+  showScreen('lessonscreen');
+  G('back-btn').style.display='flex';
+  G('bc').innerHTML=`${curTrack.icon} ${curTrack.name} › <b>${ch.title}</b>`;
+  // Set CSS var on lesson screen
+  G('lessonscreen').style.setProperty('--c',curTrack.color);
+  G('sb').style.setProperty('--c',curTrack.color);
+  G('sb-name').textContent=curTrack.name;
+  renderSb(); updateSbXP();
+  setEdMode(curTrack.type,ch);
+  const lh=buildLesson(ch,'d');
+  G('lesson-pane').innerHTML=lh; G('lesson-pane').scrollTop=0;
+  G('mob-lesson-panel').innerHTML=buildLesson(ch,'m');
+  G('mob-lesson-panel').scrollTop=0;
+  renderMobChs();
+  if(isMob()) mTab('lesson');
+  writeSave();
+}
+
+function setEdMode(type,ch){
+  ['py-mode','web-mode','sql-mode','git-mode'].forEach(id=>G(id).style.display='none');
+  G('btn-run').style.display=''; G('btn-check').style.display=''; G('btn-hint').style.display='';
+  G('btn-run').textContent='▶ Run';
+  if(type==='python'){
+    G('py-mode').style.display='flex';
+    G('ed-file').textContent='main.py';
+    G('code-ed').value=ch.ch.start;
+    syncPyHL(); setOut('od','▶ Run code to see output'); setSt('','');
+  } else if(type==='web'){
+    G('web-mode').style.display='flex';
+    G('ed-file').textContent='index.html';
+    G('web-ed').value=ch.ch.start;
+    syncWebHL(); updatePreview();
+    G('web-st').textContent='';
+  } else if(type==='sql'){
+    G('sql-mode').style.display='flex';
+    G('ed-file').textContent='query.sql';
+    G('sql-ed').value=ch.ch.start;
+    syncSqlHL();
+    G('sql-out').innerHTML='<span class="od">▶ Run query</span>'; G('sql-st').textContent='';
+    G('btn-run').textContent='▶ Run Query';
+  } else if(type==='concept'){
+    G('git-mode').style.display='flex';
+    G('ed-file').textContent='terminal';
+    G('btn-run').style.display='none'; G('btn-check').style.display='none'; G('btn-hint').style.display='none';
+    G('git-term').innerHTML='<div><span class="git-info">Git Simulator — type real git commands!</span></div>\n';
+    G('git-inp').value='';
+  }
+}
+
+function buildLesson(ch,sfx){
+  const tc=curTrack.color, isDone=done.has(ch.id);
+  const next=curChIdx+1<curTrack.chapters.length?curTrack.chapters[curChIdx+1]:null;
+  return`<div class="ch-tag">${curTrack.icon} ${curTrack.name} · Ch ${curChIdx+1} · +${ch.xp} XP</div>
+<h2 class="ch-h1">${ch.icon} ${ch.title}</h2>
+<p class="ch-sub">${ch.sub}</p>
+<div class="theory">${ch.theory}</div>
+<div class="ex-block">
+  <div class="ex-lbl">📋 Example — click to load</div>
+  <pre class="ex-code" onclick="loadEx()">${e(ch.ex)}</pre>
+  <button class="load-btn" onclick="loadEx()">▶ Load Example</button>
+</div>
+<div class="ch-box">
+  <div class="ch-box-lbl">🎯 Challenge</div>
+  <div class="ch-box-title">${ch.ch.title}</div>
+  <div class="ch-box-desc">${ch.ch.desc}</div>
+  <div class="exp-wrap">
+    <div class="exp-lbl">Expected output</div>
+    <pre class="exp-code">${e(ch.ch.exp)}</pre>
+  </div>
+</div>
+<div class="done-banner ${isDone?'show':''}" id="db-${sfx}">🎉 <strong>Challenge complete!</strong> You earned <strong>+${ch.xp} XP</strong>!</div>
+${next?`<button class="nxt-btn ${isDone?'show':''}" id="nb-${sfx}" onclick="openChapter(${curChIdx+1})">Next: ${next.icon} ${next.title} →</button>`:''}`;
+}
+
+function loadEx(){
+  const ch=curTrack.chapters[curChIdx];
+  if(curMode==='python'){G('code-ed').value=ch.ex;syncPyHL();}
+  else if(curMode==='web'){G('web-ed').value=ch.ex;syncWebHL();updatePreview();}
+  else if(curMode==='sql'){G('sql-ed').value=ch.ex;syncSqlHL();}
+  setOut('od','Press ▶ Run'); setSt('','');
+  if(isMob()) mTab('code');
+}
+
+// ═══════════════ RUN / CHECK / HINT ══════════════════════════
+async function runCode(){
+  if(curMode==='web'){updatePreview();return;}
+  if(curMode==='sql'){await runSQL();return;}
+  if(curMode==='concept')return;
+  const code=G('code-ed').value;
+  sBtn('btn-run',true,'⏳'); setOut('od','Running…'); setSt('','');
+  const{out,err}=await execPy(code);
+  if(err){setOut('oerr','❌ '+err);setSt('● Error','var(--err)');}
+  else{setOut('ook',out||'(no output)');setSt('✓ OK','var(--ok)');}
+  sBtn('btn-run',false,'▶ Run');
+  if(isMob()) mTab('code');
+}
+
+async function checkAns(){
+  const ch=curTrack.chapters[curChIdx];
+  if(curMode==='concept'){markDone(ch);return;}
+  if(curMode==='web'){
+    const c=G('web-ed').value.toLowerCase();
+    if(ch.ch.ok(c)){markDone(ch);if(isMob())mTab('lesson');}
+    else{G('web-st').textContent='⚠️ Not quite';G('web-st').style.color='var(--warn)';}
+    return;
+  }
+  if(curMode==='sql'){
+    sBtn('btn-check',true,'⏳');
+    try{
+      const raw=sqlQuery(G('sql-ed').value);
+      if(ch.ch.ok('',raw)){markDone(ch);}
+      else{G('sql-st').textContent='⚠️ Not quite';G('sql-st').style.color='var(--warn)';}
+    }catch(ex){G('sql-st').textContent='Error';G('sql-st').style.color='var(--err)';}
+    sBtn('btn-check',false,'✓ Check');
+    return;
+  }
+  sBtn('btn-check',true,'⏳');
+  const{out,err}=await execPy(G('code-ed').value);
+  if(err){
+    setOut('oerr','❌ Error:\n\n'+err); setSt('● Error','var(--err)');
+    sBtn('btn-check',false,'✓ Check'); if(isMob())mTab('code'); return;
+  }
+  if(ch.ch.ok(out)){
+    setOut('owin','🎉 Correct! +'+ch.xp+' XP\n\nYour output:\n'+out); setSt('✓ Passed','var(--ok)');
+    markDone(ch);
+  } else {
+    setOut('oerr','⚠️ Not quite.\n\nYour output:\n'+out+'\n\nTip: Compare carefully with expected above. Press 💡 for a hint!');
+    setSt('⚠️ Try again','var(--warn)');
+  }
+  sBtn('btn-check',false,'✓ Check'); if(isMob())mTab('code');
+}
+
+async function getHint(){
+  const ch=curTrack.chapters[curChIdx];
+  sBtn('btn-hint',true,'⏳');
+  if(curMode==='web'){setSt('💡 Check your HTML matches the expected structure','var(--warn)');sBtn('btn-hint',false,'💡 Hint');return;}
+  setOut('ohint','💡 Getting hint…'); if(isMob())mTab('code');
+  try{
+    const code=curMode==='sql'?G('sql-ed').value:G('code-ed').value;
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,
+        messages:[{role:'user',content:`I'm learning ${curTrack.name}. Challenge: "${ch.ch.title}: ${ch.ch.desc.replace(/<[^>]*>/g,'').replace(/&[^;]+;/g,' ')}"\nMy code:\n${code}\n\nGive a gentle 2-3 sentence hint without solving it.`}]})
+    });
+    const d=await r.json();
+    const hint=(d.content&&d.content[0]&&d.content[0].text)||'Look carefully at expected output, compare line by line.';
+    setOut('ohint','💡 Hint:\n\n'+hint);
+  }catch{setOut('ohint','💡 Hint: Compare your output line-by-line with the expected. Check spacing, capitalisation and punctuation.');}
+  sBtn('btn-hint',false,'💡 Hint');
+}
+
+function resetCode(){
+  const ch=curTrack.chapters[curChIdx];
+  if(curMode==='python'){G('code-ed').value=ch.ch.start;syncPyHL();setOut('od','▶ Run code to see output');setSt('','');}
+  else if(curMode==='web'){G('web-ed').value=ch.ch.start;syncWebHL();updatePreview();}
+  else if(curMode==='sql'){G('sql-ed').value=ch.ch.start;syncSqlHL();}
+}
+
+// ═══════════════ MARK DONE + CELEBRATE ══════════════════════
+function markDone(ch){
+  const isNew=!done.has(ch.id);
+  if(isNew){
+    done.add(ch.id); totalXP+=ch.xp; totalDone++;
+    updateChips(); updateSbXP(); renderSb(); renderMobChs();
+    // Update leaderboard
+    if(playerName){
+      const idx=leaderboard.findIndex(x=>x.name===playerName);
+      if(idx>=0)leaderboard[idx].xp=totalXP; else leaderboard.push({name:playerName,xp:totalXP});
+    }
+    writeSave();
+    spawnXP('+'+ch.xp+' XP ⚡');
+    spawnConfetti();
+  }
+  ['db-d','db-m'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('show');});
+  ['nb-d','nb-m'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('show');});
+}
+
+function spawnXP(txt){
+  const el=document.createElement('div'); el.className='xp-popup'; el.textContent=txt;
+  el.style.cssText=`left:${20+Math.random()*60}%;top:65%;z-index:9999;`;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1400);
+}
+function spawnConfetti(){
+  const cols=['#4d8df5','#c260ff','#f562b8','#f5c518','#3ecf8e','#ff4d6d','#29d7f5'];
+  for(let i=0;i<32;i++){
+    const el=document.createElement('div'); el.className='cfp';
+    el.style.cssText=`left:${Math.random()*100}%;top:-8px;background:${cols[i%cols.length]};
+      width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation-duration:${1.2+Math.random()*1.6}s;
+      animation-delay:${Math.random()*.35}s;`;
+    document.body.appendChild(el); setTimeout(()=>el.remove(),3200);
+  }
+}
+
+// ═══════════════ WEB PREVIEW ════════════════════════════════
+let pvTimer=null;
+function updatePreview(){
+  clearTimeout(pvTimer);
+  pvTimer=setTimeout(()=>{
+    const ifr=G('preview');
+    try{const d=ifr.contentDocument||ifr.contentWindow.document;d.open();d.write(G('web-ed').value);d.close();}catch{}
+    G('web-st').textContent='● Live'; G('web-st').style.color='var(--ok)';
+  },260);
+}
+
+// ═══════════════ GIT SIMULATOR ══════════════════════════════
+const gs={repo:false,branch:'main',staged:[],commits:[],branches:['main']};
+function initGit(){
+  G('git-inp').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();doGit();}});
+}
+function gp(txt,cls=''){
+  const t=G('git-term');
+  t.innerHTML+=`<div><span class="${cls}">${e(txt)}</span></div>`;
+  t.scrollTop=t.scrollHeight;
+}
+function doGit(){
+  const inp=G('git-inp'),cmd=inp.value.trim(); inp.value='';
+  if(!cmd)return;
+  const t=G('git-term');
+  t.innerHTML+=`<div><span class="git-ps1">$ </span><span class="git-cmd-text">${e(cmd)}</span></div>`;
+  const p=cmd.split(' ').filter(Boolean);
+  if(p[0]==='clear'){t.innerHTML='';return;}
+  if(p[0]==='ls'){gp('README.md  index.html  style.css  main.py');return;}
+  if(p[0]==='pwd'){gp('/home/user/my-project');return;}
+  if(p[0]==='echo'){gp(p.slice(1).join(' '));return;}
+  if(p[0]==='cd'){gp('');return;}
+  if(p[0]!=='git'){gp(`command not found: ${p[0]}. Try git commands.`,'git-err');return;}
+  const sub=p[1];
+  switch(sub){
+    case 'init': gs.repo=true; gp('Initialized empty Git repository in ./.git/','git-ok'); break;
+    case 'status': gp(`On branch ${gs.branch}`,'git-ok'); gp(gs.staged.length?'Changes staged: '+gs.staged.join(', '):'nothing to commit, working tree clean'); break;
+    case 'add': gs.staged=[p[2]||'.']; gp(`Added ${p[2]||'.'}`,'git-ok'); break;
+    case 'commit':{
+      if(!gs.staged.length){gp('nothing to commit','git-err');break;}
+      const m=cmd.match(/-m\s+"?([^"]+)"?/)?.[1]||'Update';
+      const h='a'+Math.random().toString(36).slice(2,9);
+      gs.commits.push({m,b:gs.branch,h}); gs.staged=[];
+      gp(`[${gs.branch} ${h}] ${m}`,'git-ok'); break;}
+    case 'log':
+      if(!gs.commits.length){gp('No commits yet.','git-err');break;}
+      gs.commits.slice().reverse().forEach(c=>{gp(`commit ${c.h} (${c.b})`,'git-info');gp(`    ${c.m}`,'git-ok');});break;
+    case 'branch':
+      if(p[2]&&p[2]!=='-d'&&!p[2].startsWith('-')){gs.branches.push(p[2]);gp(`Branch '${p[2]}' created`,'git-ok');}
+      else if(p[2]==='-d'){gp(`Deleted branch ${p[3]||'?'}`,'git-ok');}
+      else gp(gs.branches.map(b=>b===gs.branch?`* ${b}`:` ${b}`).join('\n'));break;
+    case 'checkout':
+      if(p[2]==='-b'){const nb=p[3]||'new';if(!gs.branches.includes(nb))gs.branches.push(nb);gs.branch=nb;gp(`Switched to new branch '${nb}'`,'git-ok');}
+      else if(p[2]){if(gs.branches.includes(p[2])){gs.branch=p[2];gp(`Switched to '${p[2]}'`,'git-ok');}else gp(`Branch '${p[2]}' not found`,'git-err');}
+      break;
+    case 'merge': gp(`Merged '${p[2]||'?'}' into '${gs.branch}'`,'git-ok');break;
+    case 'remote': if(p[2]==='add'){gp(`Remote '${p[3]}' added`,'git-ok');}else if(p[2]==='-v'){gp('origin  https://github.com/user/repo.git','git-info');}break;
+    case 'push': gp(`Pushed to origin/${gs.branch} ✓`,'git-ok');break;
+    case 'pull': gp('Already up to date.','git-ok');break;
+    case 'clone': gp(`Cloning '${(p[2]||'').split('/').pop().replace('.git','')||'repo'}'... done.`,'git-ok');break;
+    case 'stash': gp('Stash saved.','git-ok');break;
+    case 'diff': gp('(no differences)');break;
+    case '--version': gp('git version 2.43.0 (CodeQuest)');break;
+    default: gp(`'${sub}' is not a git command. Try: init status add commit log branch checkout push pull clone`,'git-err');
+  }
+  G('git-term').scrollTop=G('git-term').scrollHeight;
+}
+
+// ═══════════════ SIDEBAR / UI ════════════════════════════════
+function renderSb(){
+  G('sb-list').innerHTML=curTrack.chapters.map((ch,i)=>`
+    <div class="sb-item ${i===curChIdx?'active':''} ${done.has(ch.id)?'done':''}" onclick="openChapter(${i})">
+      <span class="sb-item-ico">${ch.icon}</span>
+      <div class="sb-item-info">
+        <div class="sb-item-name">${ch.title}</div>
+        <div class="sb-item-xp">+${ch.xp} XP</div>
+      </div>
+      <span class="sb-star">⭐</span>
+    </div>`).join('');
+}
+function renderMobChs(){
+  G('mob-chs-panel').innerHTML=
+    `<div style="padding:10px 13px;border-bottom:1px solid var(--b1);font-size:11px;font-weight:700;color:var(--c,var(--py))">${curTrack.icon} ${curTrack.name}</div>`
+    +curTrack.chapters.map((ch,i)=>`
+      <div class="sb-item ${i===curChIdx?'active':''} ${done.has(ch.id)?'done':''}" onclick="openChapter(${i})">
+        <span class="sb-item-ico">${ch.icon}</span>
+        <div class="sb-item-info"><div class="sb-item-name">${ch.title}</div><div class="sb-item-xp">+${ch.xp} XP</div></div>
+        <span class="sb-star">⭐</span>
+      </div>`).join('');
+}
+function updateSbXP(){
+  if(!curTrack)return;
+  const txp=curTrack.chapters.filter(c=>done.has(c.id)).reduce((s,c)=>s+c.xp,0);
+  const mxp=curTrack.chapters.reduce((s,c)=>s+c.xp,0);
+  G('sb-xf').style.cssText=`width:${mxp?txp/mxp*100:0}%;background:${curTrack.color}`;
+  G('sb-xn').textContent=txp+' XP'; G('sb-xt').textContent='/'+mxp;
+}
+function updateChips(){G('xv').textContent=totalXP;G('dv').textContent=totalDone;G('sv').textContent=streak;}
+
+// ═══════════════ EDITOR SETUP ════════════════════════════════
+function initEditors(){
+  function setup(ta,syncFn,runFn){
+    if(!ta)return;
+    ta.addEventListener('input',syncFn);
+    ta.addEventListener('scroll',()=>{
+      // sync highlight scroll
+      const hlId=ta.id==='code-ed'?'hl-py':ta.id==='web-ed'?'hl-web':'hl-sql';
+      const hl=document.getElementById(hlId);
+      if(hl){hl.scrollTop=ta.scrollTop;hl.scrollLeft=ta.scrollLeft;}
+    });
+    ta.addEventListener('keydown',ev=>{
+      if(ev.key==='Tab'){
+        ev.preventDefault();
+        const s=ta.selectionStart,end=ta.selectionEnd,sp=ta.id==='sql-ed'?'  ':'    ';
+        ta.value=ta.value.substring(0,s)+sp+ta.value.substring(end);
+        ta.selectionStart=ta.selectionEnd=s+sp.length; syncFn();
+      }
+      if((ev.ctrlKey||ev.metaKey)&&ev.key==='Enter'){ev.preventDefault();if(runFn)runFn();}
+    });
+  }
+  setup(G('code-ed'),syncPyHL,runCode);
+  setup(G('web-ed'),()=>{syncWebHL();updatePreview();},updatePreview);
+  setup(G('sql-ed'),syncSqlHL,runSQL);
+}
+
+// ═══════════════ MOBILE TABS ════════════════════════════════
+function mTab(tab){
+  if(!isMob())return;
+  mobCurTab=tab;
+  const tc=curTrack?curTrack.color:'var(--py)';
+  ['lesson','code','chs'].forEach(t=>{
+    const el=G('mt-'+t);
+    const on=t===tab;
+    el.classList.toggle('active',on);
+    el.style.color=on?tc:'var(--t3)';
+    el.style.borderBottomColor=on?tc:'transparent';
+  });
+  G('mob-lesson-panel').classList.toggle('active',tab==='lesson');
+  G('mob-code-panel').classList.toggle('active',tab==='code');
+  G('mob-chs-panel').classList.toggle('active',tab==='chs');
+  const ep=G('ed-panel');
+  const cp=G('mob-code-panel');
+  if(tab==='code'){
+    // Move editor INTO the code panel, then use position:absolute inset:0
+    // so it fills the container regardless of flex chain issues
+    if(ep.parentNode!==cp) cp.appendChild(ep);
+    ep.removeAttribute('style');// let CSS handle it via #mob-code-panel.active #ed-panel
+    // Force a reflow so the browser recalculates heights
+    void ep.offsetHeight;
+  } else {
+    ep.style.display='none';
+  }
+}
+
+window.addEventListener('resize',()=>{
+  if(!isMob()){
+    // Back to desktop: restore ed-panel to its desktop parent
+    const ep=G('ed-panel'), ls=G('lessonscreen');
+    if(ep.parentNode!==ls) ls.appendChild(ep);
+    ep.removeAttribute('style');
+    ['mob-lesson-panel','mob-code-panel','mob-chs-panel'].forEach(id=>G(id).classList.remove('active'));
+  } else if(curTrack){
+    // Re-apply mobile tab state after orientation change
+    mTab(mobCurTab);
+  }
+});
+
+// ═══════════════ HELPERS ════════════════════════════════════
+function G(id){return document.getElementById(id);}
+function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function setOut(cls,txt){G('out-body').innerHTML=`<span class="${cls}">${e(txt)}</span>`;}
+function setSt(txt,col){const el=G('out-st');el.textContent=txt;el.style.color=col;}
+function sBtn(id,dis,lbl){const b=G(id);if(!b)return;b.disabled=dis;if(lbl)b.textContent=lbl;}
+function isMob(){return window.innerWidth<768;}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  if(isMob()){
+    G('ed-panel').style.display='none';
+    // Listen for orientation changes
+    screen.orientation && screen.orientation.addEventListener('change',()=>{
+      setTimeout(()=>{ if(curTrack) mTab(mobCurTab); }, 100);
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  DRAG-TO-RESIZE SPLITTERS
+// ═══════════════════════════════════════════════════════════════
+function initDrags(){
+  // Horizontal drag: between code editor area and output panel
+  makeDragH('drag-py',  'py-ed-wrap',  'py-out-wrap',  'py-mode',  28, 28);
+  makeDragH('drag-sql', 'sql-ed-wrap', 'sql-out-wrap', 'sql-mode', 28, 28);
+  makeDragH('drag-web', 'web-ed-wrap-outer', 'web-preview-wrap', 'web-inner', 28, 28);
+  // Vertical drag: between lesson pane and editor panel (desktop only)
+  makeDragV('drag-v', 'lesson-pane', 'ed-panel', 'lessonscreen', 120, 120);
+}
+
+/**
+ * makeDragH — draggable horizontal divider
+ * @param {string} handleId   - the .drag-h element
+ * @param {string} topId      - element above the handle (gets flex-basis changed)
+ * @param {string} botId      - element below the handle
+ * @param {string} containerId- parent container (for total height)
+ * @param {number} minTop     - min px for top section
+ * @param {number} minBot     - min px for bottom section
+ */
+function makeDragH(handleId, topId, botId, containerId, minTop, minBot){
+  const handle = G(handleId);
+  const topEl  = G(topId);
+  const botEl  = G(botId);
+  if(!handle||!topEl||!botEl) return;
+
+  let startY=0, startTopH=0, startBotH=0, dragging=false;
+
+  function onStart(e){
+    e.preventDefault();
+    dragging=true;
+    handle.classList.add('dragging');
+    document.body.style.cursor='row-resize';
+    document.body.style.userSelect='none';
+    startY  = e.touches ? e.touches[0].clientY : e.clientY;
+    startTopH = topEl.getBoundingClientRect().height;
+    startBotH = botEl.getBoundingClientRect().height;
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup',   onEnd);
+    window.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('touchend',  onEnd);
+  }
+  function onMove(e){
+    if(!dragging) return;
+    e.preventDefault();
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    const dy = y - startY;
+    let newTop = startTopH + dy;
+    let newBot = startBotH - dy;
+    const total = startTopH + startBotH;
+    newTop = Math.max(minTop, Math.min(newTop, total - minBot));
+    newBot = total - newTop;
+    // Use flex-basis + flex-shrink:0 for precise control
+    topEl.style.flex = 'none';
+    topEl.style.height = newTop + 'px';
+    botEl.style.flex = 'none';
+    botEl.style.height = newBot + 'px';
+    // Re-sync highlight layers
+    if(topId === 'py-ed-wrap')  syncPyHL();
+    if(topId === 'sql-ed-wrap') syncSqlHL();
+  }
+  function onEnd(){
+    if(!dragging) return;
+    dragging=false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor='';
+    document.body.style.userSelect='';
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup',   onEnd);
+    window.removeEventListener('touchmove', onMove);
+    window.removeEventListener('touchend',  onEnd);
+  }
+  handle.addEventListener('mousedown',  onStart);
+  handle.addEventListener('touchstart', onStart, {passive:false});
+}
+
+/**
+ * makeDragV — draggable vertical divider (desktop only)
+ */
+function makeDragV(handleId, leftId, rightId, containerId, minLeft, minRight){
+  const handle = G(handleId);
+  const leftEl = G(leftId);
+  const rightEl= G(rightId);
+  if(!handle||!leftEl||!rightEl) return;
+
+  let startX=0, startLW=0, startRW=0, dragging=false;
+
+  function onStart(e){
+    if(isMob()) return;
+    e.preventDefault();
+    dragging=true;
+    handle.classList.add('dragging');
+    document.body.style.cursor='col-resize';
+    document.body.style.userSelect='none';
+    startX  = e.clientX;
+    startLW = leftEl.getBoundingClientRect().width;
+    startRW = rightEl.getBoundingClientRect().width;
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup',   onEnd);
+  }
+  function onMove(e){
+    if(!dragging) return;
+    const dx = e.clientX - startX;
+    let newL = startLW + dx;
+    let newR = startRW - dx;
+    const total = startLW + startRW;
+    newL = Math.max(minLeft,  Math.min(newL, total - minRight));
+    newR = total - newL;
+    leftEl.style.flex = 'none';
+    leftEl.style.width = newL + 'px';
+    rightEl.style.flex = '1';
+    rightEl.style.width = '';
+  }
+  function onEnd(){
+    if(!dragging) return;
+    dragging=false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor='';
+    document.body.style.userSelect='';
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup',   onEnd);
+  }
+  handle.addEventListener('mousedown', onStart);
+
+  // Double-click resets to default
+  handle.addEventListener('dblclick', ()=>{
+    leftEl.style.flex = '';
+    leftEl.style.width = '';
+    rightEl.style.flex = '1';
+    rightEl.style.width = '';
+  });
+}
+
+// Web mode inner container needs an id for drag
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Give web mode inner split div an id so drag can find it
+  const webInner = document.querySelector('#web-mode > div');
+  if(webInner){ webInner.id = 'web-inner'; }
+  const webEdWrap = document.querySelector('#web-mode .web-ed-wrap');
+  if(webEdWrap){ webEdWrap.id = 'web-ed-wrap-outer'; }
+  initDrags();
+});
+
+</script>
+</body>
+</html>
